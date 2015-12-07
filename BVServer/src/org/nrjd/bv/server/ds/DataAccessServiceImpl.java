@@ -19,6 +19,30 @@ public class DataAccessServiceImpl {
 
 	private static Connection	connection;
 
+	/**
+	 * Closes the connection
+	 * 
+	 * @param ps
+	 * @throws BVServerDBException
+	 */
+	private void closeConnection(PreparedStatement ps)
+	        throws BVServerDBException {
+
+		if (connection != null) {
+
+			try {
+				if (!connection.isClosed()) {
+
+					ps.close();
+					connection.close();
+				}
+			}
+			catch (SQLException e) {
+				// Ignore the Exception
+			}
+		}
+	}
+
 	private void getConnection() throws BVServerDBException {
 
 		try {
@@ -29,6 +53,7 @@ public class DataAccessServiceImpl {
 				System.out.println("Connection Established !!!! ");
 				connection = DriverManager.getConnection(
 				        "jdbc:mysql://localhost:3306/bv", "root", "gurudev");
+
 			}
 		}
 		catch (ClassNotFoundException e) {
@@ -44,6 +69,36 @@ public class DataAccessServiceImpl {
 
 	/**
 	 * 
+	 * @param e
+	 * @throws BVServerDBException
+	 */
+	private StatusCode handleException(SQLException e)
+	        throws BVServerDBException {
+
+		StatusCode code = null;
+		try {
+			connection.rollback();
+
+		}
+		catch (SQLException e1) {
+			// Ignore the Exception
+		}
+		finally {
+
+			if (e.getMessage() != null
+			        && e.getMessage().contains("EMAIL_ID_UNIQUE")) {
+				code = StatusCode.STATUS_DUPL_EMAILID;
+			}
+			else {
+				e.printStackTrace();
+				throw new BVServerDBException(e.getMessage());
+			}
+		}
+		return code;
+	}
+
+	/**
+	 * 
 	 * @param request
 	 * @throws BVServerDBException
 	 */
@@ -52,9 +107,10 @@ public class DataAccessServiceImpl {
 
 		StatusCode code = null;
 		getConnection();
+		PreparedStatement ps = null;
 
 		try {
-			PreparedStatement ps = connection
+			ps = connection
 			        .prepareStatement("insert into user_login values(?,?,?,?,?,?,?)");
 
 			ps.setInt(1, 0);
@@ -73,8 +129,10 @@ public class DataAccessServiceImpl {
 			}
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
-			throw new BVServerDBException(e.getMessage());
+			code = handleException(e);
+		}
+		finally {
+			closeConnection(ps);
 		}
 		return code;
 	}

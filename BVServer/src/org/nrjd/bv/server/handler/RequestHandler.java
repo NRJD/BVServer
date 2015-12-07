@@ -4,15 +4,30 @@
 package org.nrjd.bv.server.handler;
 
 import static org.nrjd.bv.server.dto.ServerConstant.ACTION_USER_REG;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_LANG;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_NAME;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_PHONE;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
 import org.nrjd.bv.server.ds.BVServerDBException;
 import org.nrjd.bv.server.ds.DataAccessServiceImpl;
+import org.nrjd.bv.server.dto.BVServerException;
 import org.nrjd.bv.server.dto.DataAccessRequest;
 import org.nrjd.bv.server.dto.StatusCode;
 import org.nrjd.bv.server.util.EmailUtil;
+import org.nrjd.bv.server.util.JSONHelper;
 
 /**
  * @author Sathya
@@ -21,31 +36,114 @@ import org.nrjd.bv.server.util.EmailUtil;
 public class RequestHandler {
 
 	/**
+	 * 
+	 * @param inputData
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getRequestData(InputStream inputData)
+	        throws BVServerException {
+
+		InputStreamReader isr = new InputStreamReader(inputData);
+		BufferedReader br = new BufferedReader(isr);
+		try {
+			StringBuffer xmlBuffer = new StringBuffer();
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				xmlBuffer.append(line);
+			}
+			String xmlData = xmlBuffer.toString();
+			System.out.println("XML Request Data: " + xmlData);
+			return xmlData;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new BVServerException(e.getMessage());
+		}
+		finally {
+			try {
+				br.close();
+			}
+			catch (Exception e) { /* Ignore Exception */
+			}
+			try {
+				isr.close();
+			}
+			catch (Exception e) { /* Ignore Exception */
+			}
+		}
+	}
+
+	/**
 	 * This process the request and based on the Request dispatch Path delegates
 	 * to the respective flow like User REgistry, Email Verification, Password
 	 * Reset, Update profile ,download books, etc
 	 * 
 	 * @param request
 	 * @param response
+	 * @throws Exception
 	 * @throws BVServerDBException
 	 */
-	public StatusCode processRequest(HttpServletRequest request,
-	        HttpServletResponse response) throws BVServerDBException {
+	public String processRequest(HttpServletRequest request,
+	        HttpServletResponse response) {
 
 		System.out.println(">>> processRequest");
-		StatusCode status = null;
+		String jsonResponse = null;
 		String requestURI = request.getRequestURI();
 
-		if (requestURI != null && requestURI.length() > 0) {
+		try {
+			JSONObject json = readData(request);
 
-			if (requestURI.contains(ACTION_USER_REG)) {
+			System.out.println("Read Data : " + json);
+			if (requestURI != null && requestURI.length() > 0) {
 
-				status = registerUser(request);
+				if (requestURI.contains(ACTION_USER_REG)) {
+
+					jsonResponse = registerUser(json);
+				}
 			}
 		}
+		catch (BVServerException e) {
+			e.printStackTrace();
+			jsonResponse = JSONHelper.getJSonResponse(null,
+			        StatusCode.STATUS_ERROR_SERVER);
+		}
 
-		System.out.println("<<< processRequest " + status);
-		return status;
+		System.out.println("<<< processRequest " + jsonResponse);
+		return jsonResponse;
+	}
+
+	/**
+	 * To Read The JSON data
+	 * 
+	 * @param request
+	 * @return
+	 * @throws BVServerException
+	 */
+	private JSONObject readData(HttpServletRequest request)
+	        throws BVServerException {
+		InputStream is = null;
+		try {
+			is = request.getInputStream();
+			String requestXmlData = getRequestData(is);
+
+			JSONObject json = JSONHelper.parseJSONRequest(requestXmlData);
+			return json;
+		}
+		catch (Exception e) {
+
+			throw new BVServerException(
+			        "Error while retriving the request data", e);
+		}
+		finally {
+			try {
+				is.close();
+			}
+			catch (Exception e) {
+
+				// Ignore the Exception
+			}
+		}
 	}
 
 	/**
@@ -54,32 +152,42 @@ public class RequestHandler {
 	 * @param request
 	 * @throws BVServerDBException
 	 */
-	private StatusCode registerUser(HttpServletRequest request)
-	        throws BVServerDBException {
+	private String registerUser(JSONObject json) {
 
 		System.out.println(">>> registerUser");
+		StatusCode status = null;
+		String jsonResponse = null;
+		String email = null;
+		try {
+			String name = (String) json.get(KEY_NAME);
+			String pwd = (String) json.get(KEY_PWD);
+			email = (String) json.get(KEY_EMAIL_ID);
+			String lang = (String) json.get(KEY_LANG);
+			String mobile = (String) json.get(KEY_PHONE);
 
-		String name = request.getParameter("name");
-		String pwd = request.getParameter("password");
-		String email = request.getParameter("email");
-		String lang = request.getParameter("language");
-		String mobile = request.getParameter("phoneNum");
+			DataAccessRequest dbReq = new DataAccessRequest();
+			dbReq.setEmailId(email);
+			dbReq.setLanguage(lang);
+			dbReq.setName(name);
+			dbReq.setPassword(pwd);
+			dbReq.setPhoneNumber(mobile);
 
-		DataAccessRequest dbReq = new DataAccessRequest();
-		dbReq.setEmailId(email);
-		dbReq.setLanguage(lang);
-		dbReq.setName(name);
-		dbReq.setPassword(pwd);
-		dbReq.setPhoneNumber(mobile);
+			status = new DataAccessServiceImpl().persistUser(dbReq);
 
-		StatusCode status = new DataAccessServiceImpl().persistUser(dbReq);
+			if (status != null && status == StatusCode.STATUS_USER_ADDED) {
 
-		if (status != null && status == StatusCode.STATUS_USER_ADDED) {
-
-			EmailUtil.sendEmail(email);
+				EmailUtil.sendEmail(email);
+			}
 		}
+		catch (BVServerDBException e) {
+			e.printStackTrace();
+			status = StatusCode.STATUS_ERROR_DB;
+		}
+		Map<String, String> resMap = new TreeMap<String, String>();
+		resMap.put(KEY_EMAIL_ID, email);
+		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
-		System.out.println("<<< registerUser " + status);
-		return status;
+		System.out.println("<<< registerUser " + jsonResponse);
+		return jsonResponse;
 	}
 }

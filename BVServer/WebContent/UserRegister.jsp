@@ -5,8 +5,15 @@
 <body>
     <form action="register" method="post">
  
-        <h4>Thanks for your interest in Bhakthi Vriksha App. Please click the below Verify your subscription.</h4></br>
-        <a href="">Verify</a>
+        Name:<input type="text" name="name" maxlength="50"/><br/>
+        Password:<input type="password" name="password" maxlength="16"/><br/>
+        Email Id:<input type="text" name="email" maxlength="50"/><br/>
+        Phone Number:<input type="text" name="phoneNum" maxlength="12"/><br/>
+        Language: <select name="language">
+            <option>Hindi</option>
+            <option>English</option>
+            <option>French</option>
+        </select> <br/>
         <input type="submit" value="Submit"/>
  
     </form>

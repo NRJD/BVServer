@@ -12,10 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.nrjd.bv.server.ds.BVServerDBException;
-import org.nrjd.bv.server.dto.StatusCode;
 import org.nrjd.bv.server.handler.RequestHandler;
-import org.nrjd.bv.server.util.CommonUtility;
 
 /**
  * Servlet implementation class HandleRequestServlet
@@ -51,18 +48,16 @@ public class HandleRequestServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request,
 	        HttpServletResponse response) throws ServletException, IOException {
+
+		System.out.println(">>> doPost ");
+
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		StatusCode status = null;
-		try {
-			status = new RequestHandler().processRequest(request, response);
-		}
-		catch (BVServerDBException e) {
-			e.printStackTrace();
-			status = StatusCode.STATUS_ERROR_DB;
-		}
+		String jsonResponse = new RequestHandler().processRequest(request,
+		        response);
+		out.print(jsonResponse);
 
-		out.print(CommonUtility.getMessage(status));
+		System.out.println("<<< doPost ");
 	}
 
 	/**

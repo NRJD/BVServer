@@ -25,6 +25,9 @@ public class CommonUtility {
 		case 3000:
 			desc = "User Registered Successfully. verify the Email";
 			break;
+		case 3001:
+			desc = "Email ID already Registered. verify the Email";
+			break;
 		case 3005:
 			desc = "Email Verified Successfully.";
 			break;

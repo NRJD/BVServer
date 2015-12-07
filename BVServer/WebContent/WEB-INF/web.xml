@@ -19,6 +19,11 @@
 	</servlet-mapping>
 
 
+	<servlet-mapping>
+		<servlet-name>HandleRequest</servlet-name>
+		<url-pattern>/verifyEmail</url-pattern>
+	</servlet-mapping>
+
 	<resource-ref>
 		<description>BV App</description>
 		<res-ref-name>mail/Session</res-ref-name>
