@@ -9,7 +9,8 @@ import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_CONTEXT;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_GMAIL_HOST;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_GMAIL_PORT;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SESSION;
-import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
 import java.util.Properties;
@@ -38,28 +39,25 @@ public class EmailUtil {
 	private static Session	session;
 
 	/**
+	 * Gets the HTML basic tags for Header
 	 * 
-	 * @param email
-	 * @param emailVerifCode
-	 * @param mobileVerifCode
 	 * @return
 	 */
-	public static String getBody(String emailVerifCode, String mobileVerifCode) {
-
+	private static String getBodyHeader() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("<html><head><meta charset=\"ISO-8859-1\"><title>Email Verification</title></head><body>");
-		buf.append("<h4>Hare Krishna Devotee,</h4><br> Welcome to Bhakthi Vriksha<br></br>");
+		buf.append("<html><head><meta charset=\"ISO-8859-1\"></head><body><h4>Hare Krishna Devotee,</h4><br>");
 		buf.append("All Glories To Srila Prabhupada.</br>All Glories To Sri Guru and Gauranga.</br></br>");
-		buf.append("Thanks for showing interest to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></br></br>");
-		buf.append("<p>Please ");
-		buf.append("<a href=\"http://localhost:8011/BVServer/VerifyEmail.jsp?");
-		buf.append(KEY_VERIF_CODE).append("=").append(emailVerifCode);
-		buf.append("\">click Here</a>");
-		buf.append(" to activate your account.</p>");
-		buf.append("<h5>OR</h5><p>You can also verify your email address thru Bhakti Vriksha application in your mobile by entering the 6 digit code: ");
-		buf.append("<b>").append(mobileVerifCode).append("</b></p>");
-		buf.append("<b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b><br>Bhakti Vriksha Team</body></html>");
+		return buf.toString();
+	}
 
+	/**
+	 * Gets the HTML basic tags for Trailer
+	 * 
+	 * @return
+	 */
+	private static String getBodyTrailer() {
+		StringBuffer buf = new StringBuffer();
+		buf.append("<b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b><br>Bhakti Vriksha Team</body></html>");
 		return buf.toString();
 	}
 
@@ -94,9 +92,56 @@ public class EmailUtil {
 
 	/**
 	 * 
+	 * @param email
+	 * @param emailVerifCode
+	 * @param mobileVerifCode
+	 * @return
+	 */
+	public static String getVerifEmailBody(String toEmailId,
+	        String emailVerifCode, String mobileVerifCode) {
+
+		StringBuffer buf = new StringBuffer();
+		buf.append(getBodyHeader());
+		buf.append("Thanks for showing interest to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></br></br>");
+		buf.append("<p>Please ");
+		buf.append("<a href=\"http://localhost:8011/BVServer/VerifyEmail.jsp?");
+		buf.append(KEY_VERIF_CODE).append("=").append(emailVerifCode);
+		buf.append("&").append(KEY_EMAIL_ID).append("=").append(toEmailId);
+		buf.append("\">click Here</a>");
+		buf.append(" to activate your account.</p>");
+		buf.append("<h5>OR</h5><p>You can also verify your email address thru Bhakti Vriksha application in your mobile by entering the 6 digit code: ");
+		buf.append("<b>").append(mobileVerifCode).append("</b></p>");
+		buf.append(getBodyTrailer());
+
+		return buf.toString();
+	}
+
+	/**
+	 * 
+	 * @param email
+	 * @param emailVerifCode
+	 * @param mobileVerifCode
+	 * @return
+	 */
+	public static String getWelcomeEmailBody() {
+
+		StringBuffer buf = new StringBuffer();
+		buf.append(getBodyHeader());
+		buf.append("Welcome to BV App to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></br></br>");
+		buf.append("<p>Please use the BV app from your smart phone to enjoy reading the BV manual at your ease</p>");
+		buf.append(
+		        "<p>If you have any questions or feedback please email to <b>")
+		        .append(EMAIL_ACCT_ID).append("</b> </p></br></br>");
+		buf.append(getBodyTrailer());
+
+		return buf.toString();
+	}
+
+	/**
+	 * 
 	 * @param emailId
 	 */
-	public static void sendEmail(ServerRequest srvrReq) {
+	public static void sendEmail(ServerRequest srvrReq, String subject) {
 
 		Session session = null;
 		try {
@@ -112,11 +157,14 @@ public class EmailUtil {
 			InternetAddress to[] = new InternetAddress[1];
 			to[0] = new InternetAddress(srvrReq.getEmailId());
 			message.setRecipients(Message.RecipientType.TO, to);
-			message.setSubject(EMAIL_SUBJECT);
-			message.setContent(
-			        getBody(srvrReq.getEmailVerifCode(),
-			                srvrReq.getMobileVerifCode()),
-			        "text/html;charset=UTF-8");
+			message.setSubject(subject);
+
+			String body = subject == EMAIL_SUBJECT_VER_EMAIL ? getVerifEmailBody(
+			        srvrReq.getEmailId(), srvrReq.getEmailVerifCode(),
+			        srvrReq.getMobileVerifCode()) : getWelcomeEmailBody();
+
+			message.setContent(body, "text/html;charset=UTF-8");
+
 			Transport.send(message);
 
 		}

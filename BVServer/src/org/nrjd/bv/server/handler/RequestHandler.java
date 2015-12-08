@@ -4,6 +4,7 @@
 package org.nrjd.bv.server.handler;
 
 import static org.nrjd.bv.server.dto.ServerConstant.ACTION_USER_REG;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_LANG;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_NAME;
@@ -185,7 +186,7 @@ public class RequestHandler {
 
 			if (status != null && status == StatusCode.STATUS_USER_ADDED) {
 
-				EmailUtil.sendEmail(srvrReq);
+				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_VER_EMAIL);
 			}
 		}
 		catch (BVServerDBException e) {

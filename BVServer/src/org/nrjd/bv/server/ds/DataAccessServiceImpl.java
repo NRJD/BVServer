@@ -51,7 +51,7 @@ public class DataAccessServiceImpl {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 
-			if (connection == null) {
+			if (connection == null || connection.isClosed()) {
 
 				System.out.println("Connection Established !!!! ");
 				connection = DriverManager.getConnection(

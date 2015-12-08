@@ -18,12 +18,13 @@
 	<b>Ultimate Knowledge.</b>
 	</br>
 	</br>
-		Please press the Verify button below to complete the activation.</br>
+		Please press the Verify button below to complete the activation.
 		<input type=hidden name="vCode" value="<%= request.getParameter("vCode")%>">
-		</br></br>
+		<input type=hidden name="email" value="<%= request.getParameter("email")%>">
+		</br>
 		<input type="submit" value="Verify"/>
 		
-	 
+	 </br></br>
 	<b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b>
 	<br>Bhakti Vriksha Team
 	</form>

@@ -1,5 +1,7 @@
 package org.nrjd.bv.server.servlet;
 
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
 import java.io.IOException;
@@ -16,6 +18,7 @@ import org.nrjd.bv.server.ds.BVServerDBException;
 import org.nrjd.bv.server.ds.DataAccessServiceImpl;
 import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.StatusCode;
+import org.nrjd.bv.server.util.EmailUtil;
 import org.nrjd.bv.server.util.JSONHelper;
 
 /**
@@ -53,16 +56,21 @@ public class VerifyEmailServlet extends HttpServlet {
 
 		StatusCode code = null;
 		String verifCode = request.getParameter(KEY_VERIF_CODE);
+		String emailId = request.getParameter(KEY_EMAIL_ID);
 
 		System.out.println(">>> doPost verifCode : " + verifCode);
 
 		ServerRequest dbReq = new ServerRequest();
 		dbReq.setEmailVerifCode(verifCode);
+		dbReq.setEmailId(emailId);
 		String jsonResponse = null;
 		try {
 			code = new DataAccessServiceImpl().verifyEmail(dbReq);
 
+			EmailUtil.sendEmail(dbReq, EMAIL_SUBJECT_WELCOME);
 			jsonResponse = JSONHelper.getJSonResponse(null, code);
+
+			response.sendRedirect("EmailVerified.jsp");
 		}
 		catch (BVServerDBException e) {
 			e.printStackTrace();

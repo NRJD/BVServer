@@ -4,18 +4,20 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>BV - Email Verification Success</title>
+<title>Bhakthi Vriksha Account Activated</title>
 </head>
 <body>
 
-<form action="verifyEmail" method="post">
+<form action="successEmail" method="post">
+
 	<h4>Hare Krishna Devotee,</h4>
 	<br> Welcome to Bhakthi Vriksha
 	<br></br>All Glories To Srila Prabhupada.
 	</br>All Glories To Sri Guru and Gauranga.
 	</br>
-	</br>Your account has been activated. Please download the Bhakthi Vriksha manuals from the mobile app.</b>
-	</br>
+	</br>Your account has been activated.</b>
+	
+	</br>A welcome kit has been emailed to your subscribed email address. Check the email for more details</b>
 	</br>
 	 
 	<b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b>
