@@ -37,28 +37,18 @@ public class VerifyEmailServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	@Override
-	protected void doGet(HttpServletRequest request,
-	        HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
 	@Override
-	protected void doPost(HttpServletRequest request,
+	protected void doGet(HttpServletRequest request,
 	        HttpServletResponse response) throws ServletException, IOException {
 
 		StatusCode code = null;
 		String verifCode = request.getParameter(KEY_VERIF_CODE);
 		String emailId = request.getParameter(KEY_EMAIL_ID);
 
-		System.out.println(">>> doPost verifCode : " + verifCode);
+		System.out.println(">>> doGet verifCode : " + verifCode);
 
 		ServerRequest dbReq = new ServerRequest();
 		dbReq.setEmailVerifCode(verifCode);
@@ -81,7 +71,7 @@ public class VerifyEmailServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		out.print(jsonResponse);
 		out.close();
-		System.out.println("<<< doPost " + jsonResponse);
+		System.out.println("<<< doGet " + jsonResponse);
 	}
 
 	/**

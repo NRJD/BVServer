@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<form action="verifyEmail" method="post">
+<form action="verifyEmail" method="get">
 	<h4>Hare Krishna Devotee,</h4>
 	<br> Welcome to Bhakthi Vriksha
 	<br></br>All Glories To Srila Prabhupada.
