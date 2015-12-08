@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +26,7 @@ import org.json.simple.JSONObject;
 import org.nrjd.bv.server.ds.BVServerDBException;
 import org.nrjd.bv.server.ds.DataAccessServiceImpl;
 import org.nrjd.bv.server.dto.BVServerException;
-import org.nrjd.bv.server.dto.DataAccessRequest;
+import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.StatusCode;
 import org.nrjd.bv.server.util.EmailUtil;
 import org.nrjd.bv.server.util.JSONHelper;
@@ -165,18 +167,25 @@ public class RequestHandler {
 			String lang = (String) json.get(KEY_LANG);
 			String mobile = (String) json.get(KEY_PHONE);
 
-			DataAccessRequest dbReq = new DataAccessRequest();
-			dbReq.setEmailId(email);
-			dbReq.setLanguage(lang);
-			dbReq.setName(name);
-			dbReq.setPassword(pwd);
-			dbReq.setPhoneNumber(mobile);
+			UUID uuid = UUID.randomUUID();
+			String emailVerifCode = uuid.toString().replaceAll("-", "")
+			        .toUpperCase();
+			int mobVerifCode = (100000 + new Random().nextInt(899999));
 
-			status = new DataAccessServiceImpl().persistUser(dbReq);
+			ServerRequest srvrReq = new ServerRequest();
+			srvrReq.setEmailId(email);
+			srvrReq.setLanguage(lang);
+			srvrReq.setName(name);
+			srvrReq.setPassword(pwd);
+			srvrReq.setPhoneNumber(mobile);
+			srvrReq.setEmailVerifCode(emailVerifCode);
+			srvrReq.setMobileVerifCode(String.valueOf(mobVerifCode));
+
+			status = new DataAccessServiceImpl().persistUser(srvrReq);
 
 			if (status != null && status == StatusCode.STATUS_USER_ADDED) {
 
-				EmailUtil.sendEmail(email);
+				EmailUtil.sendEmail(srvrReq);
 			}
 		}
 		catch (BVServerDBException e) {

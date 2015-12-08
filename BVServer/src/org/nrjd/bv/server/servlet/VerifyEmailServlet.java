@@ -1,33 +1,34 @@
 package org.nrjd.bv.server.servlet;
 
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.nrjd.bv.server.handler.RequestHandler;
+import org.nrjd.bv.server.ds.BVServerDBException;
+import org.nrjd.bv.server.ds.DataAccessServiceImpl;
+import org.nrjd.bv.server.dto.ServerRequest;
+import org.nrjd.bv.server.dto.StatusCode;
+import org.nrjd.bv.server.util.JSONHelper;
 
 /**
  * Servlet implementation class HandleRequestServlet
  */
-public class HandleRequestServlet extends HttpServlet {
+public class VerifyEmailServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long	serialVersionUID	= 5586492332079327778L;
-	ServletContext	          context;
+	private static final long	serialVersionUID	= -9182901800695800141L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public HandleRequestServlet() {
+	public VerifyEmailServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -50,15 +51,29 @@ public class HandleRequestServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 	        HttpServletResponse response) throws ServletException, IOException {
 
-		System.out.println(">>> doPost ");
+		StatusCode code = null;
+		String verifCode = request.getParameter(KEY_VERIF_CODE);
 
+		System.out.println(">>> doPost verifCode : " + verifCode);
+
+		ServerRequest dbReq = new ServerRequest();
+		dbReq.setEmailVerifCode(verifCode);
+		String jsonResponse = null;
+		try {
+			code = new DataAccessServiceImpl().verifyEmail(dbReq);
+
+			jsonResponse = JSONHelper.getJSonResponse(null, code);
+		}
+		catch (BVServerDBException e) {
+			e.printStackTrace();
+			jsonResponse = JSONHelper.getJSonResponse(null,
+			        StatusCode.STATUS_ERROR_SERVER);
+		}
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		String jsonResponse = new RequestHandler().processRequest(request,
-		        response);
 		out.print(jsonResponse);
 		out.close();
-		System.out.println("<<< doPost ");
+		System.out.println("<<< doPost " + jsonResponse);
 	}
 
 	/**

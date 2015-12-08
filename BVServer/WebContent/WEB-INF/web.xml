@@ -19,8 +19,13 @@
 	</servlet-mapping>
 
 
+	<servlet>
+		<servlet-name>VerifyEmail</servlet-name>
+		<servlet-class>org.nrjd.bv.server.servlet.VerifyEmailServlet</servlet-class>
+	</servlet>
+
 	<servlet-mapping>
-		<servlet-name>HandleRequest</servlet-name>
+		<servlet-name>VerifyEmail</servlet-name>
 		<url-pattern>/verifyEmail</url-pattern>
 	</servlet-mapping>
 

@@ -3,12 +3,15 @@
  */
 package org.nrjd.bv.server.ds;
 
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_PERSIST_USER;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_VERIFY_EMAIL;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.nrjd.bv.server.dto.DataAccessRequest;
+import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.StatusCode;
 
 /**
@@ -102,7 +105,7 @@ public class DataAccessServiceImpl {
 	 * @param request
 	 * @throws BVServerDBException
 	 */
-	public StatusCode persistUser(DataAccessRequest request)
+	public StatusCode persistUser(ServerRequest request)
 	        throws BVServerDBException {
 
 		StatusCode code = null;
@@ -110,8 +113,7 @@ public class DataAccessServiceImpl {
 		PreparedStatement ps = null;
 
 		try {
-			ps = connection
-			        .prepareStatement("insert into user_login values(?,?,?,?,?,?,?)");
+			ps = connection.prepareStatement(QRY_PERSIST_USER);
 
 			ps.setInt(1, 0);
 			ps.setString(2, request.getName());
@@ -120,12 +122,50 @@ public class DataAccessServiceImpl {
 			ps.setString(5, request.getPhoneNumber());
 			ps.setString(6, request.getLanguage());
 			ps.setInt(7, 0);
+			ps.setString(8, request.getEmailVerifCode());
+			ps.setString(9, request.getMobileVerifCode());
 
 			int i = ps.executeUpdate();
 
 			if (i > 0) {
 
 				code = StatusCode.STATUS_USER_ADDED;
+			}
+		}
+		catch (SQLException e) {
+			code = handleException(e);
+		}
+		finally {
+			closeConnection(ps);
+		}
+		return code;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	public StatusCode verifyEmail(ServerRequest request)
+	        throws BVServerDBException {
+
+		StatusCode code = null;
+		getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			ps = connection.prepareStatement(QRY_VERIFY_EMAIL);
+
+			ps.setString(1, request.getEmailVerifCode());
+
+			int i = ps.executeUpdate();
+
+			if (i > 0) {
+
+				code = StatusCode.STATUS_EMAIL_VERIFIED;
+			}
+			else {
+				code = StatusCode.STATUS_EMAIL_NOT_VERIFIED;
 			}
 		}
 		catch (SQLException e) {

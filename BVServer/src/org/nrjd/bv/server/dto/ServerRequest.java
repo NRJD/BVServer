@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author Sathya
  * 
  */
-public class DataAccessRequest implements Serializable {
+public class ServerRequest implements Serializable {
 
 	/**
 	 * 
@@ -22,6 +22,8 @@ public class DataAccessRequest implements Serializable {
 	private String	          phoneNumber;
 	private String	          language;
 	private boolean	          emailVerified;
+	private String	          emailVerifCode;
+	private String	          mobileVerifCode;
 
 	/**
 	 * @return the emailId
@@ -31,10 +33,24 @@ public class DataAccessRequest implements Serializable {
 	}
 
 	/**
+	 * @return the emailVerifCode
+	 */
+	public String getEmailVerifCode() {
+		return emailVerifCode;
+	}
+
+	/**
 	 * @return the language
 	 */
 	public String getLanguage() {
 		return language;
+	}
+
+	/**
+	 * @return the mobileVerifCode
+	 */
+	public String getMobileVerifCode() {
+		return mobileVerifCode;
 	}
 
 	/**
@@ -74,6 +90,14 @@ public class DataAccessRequest implements Serializable {
 	}
 
 	/**
+	 * @param emailVerifCode
+	 *            the emailVerifCode to set
+	 */
+	public void setEmailVerifCode(String emailVerifCode) {
+		this.emailVerifCode = emailVerifCode;
+	}
+
+	/**
 	 * @param emailVerified
 	 *            the emailVerified to set
 	 */
@@ -87,6 +111,14 @@ public class DataAccessRequest implements Serializable {
 	 */
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	/**
+	 * @param mobileVerifCode
+	 *            the mobileVerifCode to set
+	 */
+	public void setMobileVerifCode(String mobileVerifCode) {
+		this.mobileVerifCode = mobileVerifCode;
 	}
 
 	/**

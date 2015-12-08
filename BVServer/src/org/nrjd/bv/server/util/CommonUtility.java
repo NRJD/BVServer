@@ -31,6 +31,9 @@ public class CommonUtility {
 		case 3005:
 			desc = "Email Verified Successfully.";
 			break;
+		case 3006:
+			desc = "Email Not Verified. Please activate the account by following the directions in the subscription email";
+			break;
 		case 3007:
 			desc = "Failed to process the Request due to Database Error.Contact System Admin";
 			break;

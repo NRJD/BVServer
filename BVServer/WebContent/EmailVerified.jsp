@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>BV - Email Verification</title>
+<title>BV - Email Verification Success</title>
 </head>
 <body>
 
@@ -14,15 +14,9 @@
 	<br></br>All Glories To Srila Prabhupada.
 	</br>All Glories To Sri Guru and Gauranga.
 	</br>
-	</br>Thanks for showing interest to experience spiritual bliss and gain the
-	<b>Ultimate Knowledge.</b>
+	</br>Your account has been activated. Please download the Bhakthi Vriksha manuals from the mobile app.</b>
 	</br>
 	</br>
-		Please press the Verify button below to complete the activation.</br>
-		<input type=hidden name="vCode" value="<%= request.getParameter("vCode")%>">
-		</br></br>
-		<input type="submit" value="Verify"/>
-		
 	 
 	<b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b>
 	<br>Bhakti Vriksha Team
