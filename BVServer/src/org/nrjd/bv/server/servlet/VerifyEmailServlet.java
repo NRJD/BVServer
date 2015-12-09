@@ -5,7 +5,6 @@ import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -19,7 +18,6 @@ import org.nrjd.bv.server.ds.DataAccessServiceImpl;
 import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.StatusCode;
 import org.nrjd.bv.server.util.EmailUtil;
-import org.nrjd.bv.server.util.JSONHelper;
 
 /**
  * Servlet implementation class HandleRequestServlet
@@ -48,30 +46,36 @@ public class VerifyEmailServlet extends HttpServlet {
 		String verifCode = request.getParameter(KEY_VERIF_CODE);
 		String emailId = request.getParameter(KEY_EMAIL_ID);
 
-		System.out.println(">>> doGet verifCode : " + verifCode);
+		System.out.println(">>> doGet verifCode : " + verifCode
+		        + "\n emailId : " + emailId);
 
 		ServerRequest dbReq = new ServerRequest();
 		dbReq.setEmailVerifCode(verifCode);
 		dbReq.setEmailId(emailId);
-		String jsonResponse = null;
+		boolean isSuccess = false;
 		try {
-			code = new DataAccessServiceImpl().verifyEmail(dbReq);
+			if (verifCode != null && emailId != null && verifCode.length() > 0
+			        && emailId.length() > 0) {
 
-			EmailUtil.sendEmail(dbReq, EMAIL_SUBJECT_WELCOME);
-			jsonResponse = JSONHelper.getJSonResponse(null, code);
+				code = new DataAccessServiceImpl().verifyEmail(dbReq);
 
-			response.sendRedirect("EmailVerified.jsp");
+				if (code == StatusCode.STATUS_EMAIL_VERIFIED) {
+
+					EmailUtil.sendEmail(dbReq, EMAIL_SUBJECT_WELCOME);
+					isSuccess = true;
+				}
+			}
 		}
 		catch (BVServerDBException e) {
 			e.printStackTrace();
-			jsonResponse = JSONHelper.getJSonResponse(null,
-			        StatusCode.STATUS_ERROR_SERVER);
 		}
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		out.print(jsonResponse);
-		out.close();
-		System.out.println("<<< doGet " + jsonResponse);
+		if (isSuccess) {
+			response.sendRedirect("VerifyEmailSuccess.jsp");
+		}
+		else {
+			response.sendRedirect("VerifyEmailFailed.jsp");
+		}
+		System.out.println("<<< doGet ");
 	}
 
 	/**

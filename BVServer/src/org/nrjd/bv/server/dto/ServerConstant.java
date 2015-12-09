@@ -33,7 +33,7 @@ public final class ServerConstant {
 	public static String	EMAIL_SESSION	        = "mail/Session";
 	public static String	EMAIL_CONTEXT	        = "java:comp/env";
 	public static String	QRY_PERSIST_USER	    = "insert into user_login values(?,?,?,?,?,?,?,?,?)";
-	public static String	QRY_VERIFY_EMAIL	    = "UPDATE user_login SET EMAIL_VERIFIED=1 WHERE EMAIL_VERIF_CODE=?";
+	public static String	QRY_VERIFY_EMAIL	    = "UPDATE user_login SET EMAIL_VERIFIED=1 WHERE EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
 
 	private ServerConstant() {
 

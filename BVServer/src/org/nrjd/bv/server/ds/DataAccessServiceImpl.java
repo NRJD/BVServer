@@ -157,6 +157,7 @@ public class DataAccessServiceImpl {
 			ps = connection.prepareStatement(QRY_VERIFY_EMAIL);
 
 			ps.setString(1, request.getEmailVerifCode());
+			ps.setString(2, request.getEmailId());
 
 			int i = ps.executeUpdate();
 
