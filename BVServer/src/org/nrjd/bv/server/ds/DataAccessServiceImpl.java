@@ -3,12 +3,14 @@
  */
 package org.nrjd.bv.server.ds;
 
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_EMAIL_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_PERSIST_USER;
-import static org.nrjd.bv.server.dto.ServerConstant.QRY_VERIFY_EMAIL;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_EMAIL;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.nrjd.bv.server.dto.ServerRequest;
@@ -34,9 +36,8 @@ public class DataAccessServiceImpl {
 		if (connection != null) {
 
 			try {
-				if (!connection.isClosed()) {
+				if (!connection.isClosed() && ps != null) {
 
-					ps.close();
 					connection.close();
 				}
 			}
@@ -100,6 +101,39 @@ public class DataAccessServiceImpl {
 		return code;
 	}
 
+	private boolean isEmailAlreadyVerified(ServerRequest request)
+	        throws BVServerDBException {
+
+		getConnection();
+		PreparedStatement ps = null;
+		boolean emailVerified = false;
+		try {
+
+			ps = connection.prepareStatement(QRY_IS_EMAIL_VERIFIED);
+
+			ps.setString(1, request.getEmailVerifCode());
+			ps.setString(2, request.getEmailId());
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs != null) {
+
+				while (rs.next()) {
+
+					emailVerified = rs.getInt(1) == 1 ? true : false;
+				}
+			}
+		}
+		catch (SQLException e) {
+			// ignore
+		}
+		finally {
+			closeConnection(ps);
+		}
+
+		return emailVerified;
+	}
+
 	/**
 	 * 
 	 * @param request
@@ -149,25 +183,33 @@ public class DataAccessServiceImpl {
 	public StatusCode verifyEmail(ServerRequest request)
 	        throws BVServerDBException {
 
+		boolean isEmailVerified = isEmailAlreadyVerified(request);
 		StatusCode code = null;
 		getConnection();
 		PreparedStatement ps = null;
 
 		try {
-			ps = connection.prepareStatement(QRY_VERIFY_EMAIL);
 
-			ps.setString(1, request.getEmailVerifCode());
-			ps.setString(2, request.getEmailId());
+			if (!isEmailVerified) {
+				ps = connection.prepareStatement(QRY_UPDATE_VERIFY_EMAIL);
 
-			int i = ps.executeUpdate();
+				ps.setString(1, request.getEmailVerifCode());
+				ps.setString(2, request.getEmailId());
 
-			if (i > 0) {
+				int i = ps.executeUpdate();
 
-				code = StatusCode.STATUS_EMAIL_VERIFIED;
+				if (i > 0) {
+
+					code = StatusCode.STATUS_EMAIL_VERIFIED;
+				}
+				else {
+					code = StatusCode.STATUS_EMAIL_NOT_VERIFIED;
+				}
 			}
 			else {
-				code = StatusCode.STATUS_EMAIL_NOT_VERIFIED;
+				code = StatusCode.STATUS_EMAIL_ALREADY_VERIFIED;
 			}
+
 		}
 		catch (SQLException e) {
 			code = handleException(e);

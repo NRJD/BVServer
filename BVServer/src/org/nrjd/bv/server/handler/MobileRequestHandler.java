@@ -36,7 +36,7 @@ import org.nrjd.bv.server.util.JSONHelper;
  * @author Sathya
  * 
  */
-public class RequestHandler {
+public class MobileRequestHandler {
 
 	/**
 	 * 

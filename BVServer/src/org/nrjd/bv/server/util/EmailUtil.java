@@ -45,8 +45,8 @@ public class EmailUtil {
 	 */
 	private static String getBodyHeader() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("<html><head><meta charset=\"ISO-8859-1\"></head><body><h4>Hare Krishna Devotee,</h4><br>");
-		buf.append("All Glories To Srila Prabhupada.</br>All Glories To Sri Guru and Gauranga.</br></br>");
+		buf.append("<html><head><meta charset=\"ISO-8859-1\"></head><body><h4>Hare Krishna Devotee,</h4>");
+		buf.append("<p>All Glories To Srila Prabhupada.<br></br>All Glories To Sri Guru and Gauranga.</p>");
 		return buf.toString();
 	}
 
@@ -57,7 +57,7 @@ public class EmailUtil {
 	 */
 	private static String getBodyTrailer() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("<b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b><br>Bhakti Vriksha Team</body></html>");
+		buf.append("<p><b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b><br>Bhakti Vriksha Team</p></body></html>");
 		return buf.toString();
 	}
 
@@ -102,7 +102,7 @@ public class EmailUtil {
 
 		StringBuffer buf = new StringBuffer();
 		buf.append(getBodyHeader());
-		buf.append("Thanks for showing interest to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></br></br>");
+		buf.append("<br>Thanks for showing interest to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></br>");
 		buf.append("<p>Please ");
 		buf.append("<a href=\"http://localhost:8011/BVServer/VerifyEmail.jsp?");
 		buf.append(KEY_VERIF_CODE).append("=").append(emailVerifCode);
@@ -127,11 +127,11 @@ public class EmailUtil {
 
 		StringBuffer buf = new StringBuffer();
 		buf.append(getBodyHeader());
-		buf.append("Welcome to BV App to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></br></br>");
-		buf.append("<p>Please use the BV app from your smart phone to enjoy reading the BV manual at your ease</p>");
+		buf.append("<br></br><p>Welcome to BV App to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></p>");
+		buf.append("<br></br<p>Please use the BV app from your smart phone to enjoy reading the BV manual at your ease</p><br></br>");
 		buf.append(
 		        "<p>If you have any questions or feedback please email to <b>")
-		        .append(EMAIL_ACCT_ID).append("</b> </p></br></br>");
+		        .append(EMAIL_ACCT_ID).append("</b> </p><br></br>");
 		buf.append(getBodyTrailer());
 
 		return buf.toString();

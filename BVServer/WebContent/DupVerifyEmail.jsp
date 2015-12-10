@@ -11,7 +11,7 @@
 <form action="successEmail" method="get">
 
 	<h4>Hare Krishna Devotee,</h4>
-	<h4 id="statText"><font color="red">Your Account is not Activated</font></h4>
+	<h4 id="statText"><font color="red">Your Account was already Activated</font></h4>
 	All Glories To Srila Prabhupada.
 	</br>All Glories To Sri Guru and Gauranga.
 	</br>

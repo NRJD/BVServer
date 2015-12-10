@@ -10,7 +10,7 @@
 
 	<servlet>
 		<servlet-name>HandleRequest</servlet-name>
-		<servlet-class>org.nrjd.bv.server.servlet.HandleRequestServlet</servlet-class>
+		<servlet-class>org.nrjd.bv.server.servlet.MobileRequestServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>

@@ -73,7 +73,9 @@ public class VerifyEmailServlet extends HttpServlet {
 			response.sendRedirect("VerifyEmailSuccess.jsp");
 		}
 		else {
-			response.sendRedirect("VerifyEmailFailed.jsp");
+			String reDirectPage = code == StatusCode.STATUS_EMAIL_ALREADY_VERIFIED ? "DupVerifyEmail.jsp"
+			        : "VerifyEmailFailed.jsp";
+			response.sendRedirect(reDirectPage);
 		}
 		System.out.println("<<< doGet ");
 	}

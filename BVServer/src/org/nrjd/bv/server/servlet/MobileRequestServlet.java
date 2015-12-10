@@ -11,12 +11,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.nrjd.bv.server.handler.RequestHandler;
+import org.nrjd.bv.server.handler.MobileRequestHandler;
 
 /**
  * Servlet implementation class HandleRequestServlet
  */
-public class HandleRequestServlet extends HttpServlet {
+public class MobileRequestServlet extends HttpServlet {
 
 	/**
 	 * 
@@ -27,7 +27,7 @@ public class HandleRequestServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public HandleRequestServlet() {
+	public MobileRequestServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -54,7 +54,7 @@ public class HandleRequestServlet extends HttpServlet {
 
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		String jsonResponse = new RequestHandler().processRequest(request,
+		String jsonResponse = new MobileRequestHandler().processRequest(request,
 		        response);
 		out.print(jsonResponse);
 		out.close();
