@@ -3,9 +3,11 @@
  */
 package org.nrjd.bv.server.ds;
 
-import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_EMAIL_VERIFIED;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_EMAIL_VERIFIED;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_MOBILE_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_PERSIST_USER;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_EMAIL;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_MOBILE;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -101,17 +103,19 @@ public class DataAccessServiceImpl {
 		return code;
 	}
 
-	private boolean isEmailAlreadyVerified(ServerRequest request)
+	private boolean isAlreadyVerified(ServerRequest request)
 	        throws BVServerDBException {
 
 		getConnection();
 		PreparedStatement ps = null;
 		boolean emailVerified = false;
 		try {
-
-			ps = connection.prepareStatement(QRY_IS_EMAIL_VERIFIED);
-
-			ps.setString(1, request.getEmailVerifCode());
+			String qry = request.isEmailVerification() ? QRY_IS_ACCT_EMAIL_VERIFIED
+			        : QRY_IS_ACCT_MOBILE_VERIFIED;
+			ps = connection.prepareStatement(qry);
+			String verifCode = request.isEmailVerification() ? request
+			        .getEmailVerifCode() : request.getMobileVerifCode();
+			ps.setString(1, verifCode);
 			ps.setString(2, request.getEmailId());
 
 			ResultSet rs = ps.executeQuery();
@@ -180,10 +184,10 @@ public class DataAccessServiceImpl {
 	 * @param request
 	 * @throws BVServerDBException
 	 */
-	public StatusCode verifyEmail(ServerRequest request)
+	public StatusCode verifySubscription(ServerRequest request)
 	        throws BVServerDBException {
 
-		boolean isEmailVerified = isEmailAlreadyVerified(request);
+		boolean isEmailVerified = isAlreadyVerified(request);
 		StatusCode code = null;
 		getConnection();
 		PreparedStatement ps = null;
@@ -191,23 +195,29 @@ public class DataAccessServiceImpl {
 		try {
 
 			if (!isEmailVerified) {
-				ps = connection.prepareStatement(QRY_UPDATE_VERIFY_EMAIL);
+				String qry = request.isEmailVerification() ? QRY_UPDATE_VERIFY_EMAIL
+				        : QRY_UPDATE_VERIFY_MOBILE;
 
-				ps.setString(1, request.getEmailVerifCode());
+				ps = connection.prepareStatement(qry);
+
+				String verifCode = request.isEmailVerification() ? request
+				        .getEmailVerifCode() : request.getMobileVerifCode();
+
+				ps.setString(1, verifCode);
 				ps.setString(2, request.getEmailId());
 
 				int i = ps.executeUpdate();
 
 				if (i > 0) {
 
-					code = StatusCode.STATUS_EMAIL_VERIFIED;
+					code = StatusCode.STATUS_ACCT_VERIFIED;
 				}
 				else {
-					code = StatusCode.STATUS_EMAIL_NOT_VERIFIED;
+					code = StatusCode.STATUS_ACCT_NOT_VERIFIED;
 				}
 			}
 			else {
-				code = StatusCode.STATUS_EMAIL_ALREADY_VERIFIED;
+				code = StatusCode.STATUS_ACCT_ALREADY_VERIFIED;
 			}
 
 		}

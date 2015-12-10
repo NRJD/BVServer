@@ -13,9 +13,9 @@
 	<h4>Hare Krishna Devotee,</h4>
 	<h4 id="statText"><font color="red">Your Account was already Activated</font></h4>
 	All Glories To Srila Prabhupada.
-	</br>All Glories To Sri Guru and Gauranga.
-	</br>
-	</br>
+	<br/>All Glories To Sri Guru and Gauranga.
+	<br/>
+	<br/>
 	<p>Your Account has not been activated because the Email address or verification code did not match with our records.
 	<br>
 	Please follow the link provided in your subscription activation email to activate your account.

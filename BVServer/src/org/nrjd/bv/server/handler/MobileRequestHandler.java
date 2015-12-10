@@ -3,13 +3,17 @@
  */
 package org.nrjd.bv.server.handler;
 
-import static org.nrjd.bv.server.dto.ServerConstant.ACTION_USER_REG;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_ACCT_VERIFY_MOBILE;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_REGISTER;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_FLOW;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_LANG;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_NAME;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_PHONE;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -97,12 +101,18 @@ public class MobileRequestHandler {
 		try {
 			JSONObject json = readData(request);
 
+			String flowCommand = (String) json.get(KEY_FLOW);
 			System.out.println("Read Data : " + json);
-			if (requestURI != null && requestURI.length() > 0) {
+			if (flowCommand != null && flowCommand.length() > 0) {
 
-				if (requestURI.contains(ACTION_USER_REG)) {
+				if (CMD_REGISTER.equals(flowCommand)) {
 
 					jsonResponse = registerUser(json);
+				}
+
+				if (CMD_ACCT_VERIFY_MOBILE.equals(flowCommand)) {
+
+					jsonResponse = verifyAcctFromMobile(json);
 				}
 			}
 		}
@@ -198,6 +208,49 @@ public class MobileRequestHandler {
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
 		System.out.println("<<< registerUser " + jsonResponse);
+		return jsonResponse;
+	}
+
+	/**
+	 * This method verifies the Account subscription request receievd from
+	 * Mobiel using the Email ID and Mobile Verification Code.
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	private String verifyAcctFromMobile(JSONObject json) {
+
+		System.out.println(">>> verifyAcctFromMobile");
+		StatusCode status = null;
+		String jsonResponse = null;
+		String email = null;
+		String mobVerifCode = null;
+		try {
+			mobVerifCode = (String) json.get(KEY_VERIF_CODE);
+			email = (String) json.get(KEY_EMAIL_ID);
+
+			ServerRequest srvrReq = new ServerRequest();
+			srvrReq.setEmailId(email);
+			srvrReq.setMobileVerifCode(String.valueOf(mobVerifCode));
+			srvrReq.setMobileVerification(true);
+
+			status = new DataAccessServiceImpl().verifySubscription(srvrReq);
+
+			if (status == StatusCode.STATUS_ACCT_VERIFIED) {
+
+				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_WELCOME);
+			}
+		}
+		catch (BVServerDBException e) {
+			e.printStackTrace();
+			status = StatusCode.STATUS_ERROR_DB;
+		}
+		Map<String, String> resMap = new TreeMap<String, String>();
+		resMap.put(KEY_EMAIL_ID, email);
+		resMap.put(KEY_VERIF_CODE, mobVerifCode);
+		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
+
+		System.out.println("<<< verifyAcctFromMobile " + jsonResponse);
 		return jsonResponse;
 	}
 }

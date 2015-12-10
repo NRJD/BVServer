@@ -29,16 +29,19 @@ public class CommonUtility {
 			desc = "Email ID already Registered. verify the Email";
 			break;
 		case 3005:
-			desc = "Email Verified Successfully.";
+			desc = "Account Verified Successfully.";
 			break;
 		case 3006:
-			desc = "Email Not Verified. Please activate the account by following the directions in the subscription email";
+			desc = "Account Not Activated. Please activate the account by following the directions in the subscription email";
 			break;
 		case 3007:
 			desc = "Failed to process the Request due to Database Error.Contact System Admin";
 			break;
 		case 3008:
 			desc = "Failed to process the Request due to Server Technical Error.Contact System Admin";
+			break;
+		case 3011:
+			desc = "Your Account has been already activated.";
 			break;
 		}
 

@@ -52,14 +52,16 @@ public class VerifyEmailServlet extends HttpServlet {
 		ServerRequest dbReq = new ServerRequest();
 		dbReq.setEmailVerifCode(verifCode);
 		dbReq.setEmailId(emailId);
+		dbReq.setEmailVerification(true);
+
 		boolean isSuccess = false;
 		try {
 			if (verifCode != null && emailId != null && verifCode.length() > 0
 			        && emailId.length() > 0) {
 
-				code = new DataAccessServiceImpl().verifyEmail(dbReq);
+				code = new DataAccessServiceImpl().verifySubscription(dbReq);
 
-				if (code == StatusCode.STATUS_EMAIL_VERIFIED) {
+				if (code == StatusCode.STATUS_ACCT_VERIFIED) {
 
 					EmailUtil.sendEmail(dbReq, EMAIL_SUBJECT_WELCOME);
 					isSuccess = true;
@@ -73,7 +75,7 @@ public class VerifyEmailServlet extends HttpServlet {
 			response.sendRedirect("VerifyEmailSuccess.jsp");
 		}
 		else {
-			String reDirectPage = code == StatusCode.STATUS_EMAIL_ALREADY_VERIFIED ? "DupVerifyEmail.jsp"
+			String reDirectPage = code == StatusCode.STATUS_ACCT_ALREADY_VERIFIED ? "DupVerifyEmail.jsp"
 			        : "VerifyEmailFailed.jsp";
 			response.sendRedirect(reDirectPage);
 		}

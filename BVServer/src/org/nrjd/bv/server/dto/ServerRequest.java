@@ -11,19 +11,16 @@ import java.io.Serializable;
  */
 public class ServerRequest implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long	serialVersionUID	= 4646276734320207790L;
-
+	private static final long	serialVersionUID	= -2929704671638148115L;
 	private String	          name;
 	private String	          emailId;
 	private String	          password;
 	private String	          phoneNumber;
 	private String	          language;
-	private boolean	          emailVerified;
 	private String	          emailVerifCode;
 	private String	          mobileVerifCode;
+	private boolean	          mobileVerification;
+	private boolean	          emailVerification;
 
 	/**
 	 * @return the emailId
@@ -75,10 +72,17 @@ public class ServerRequest implements Serializable {
 	}
 
 	/**
-	 * @return the emailVerified
+	 * @return the emailVerification
 	 */
-	public boolean isEmailVerified() {
-		return emailVerified;
+	public boolean isEmailVerification() {
+		return emailVerification;
+	}
+
+	/**
+	 * @return the mobileVerification
+	 */
+	public boolean isMobileVerification() {
+		return mobileVerification;
 	}
 
 	/**
@@ -98,11 +102,11 @@ public class ServerRequest implements Serializable {
 	}
 
 	/**
-	 * @param emailVerified
-	 *            the emailVerified to set
+	 * @param emailVerification
+	 *            the emailVerification to set
 	 */
-	public void setEmailVerified(boolean emailVerified) {
-		this.emailVerified = emailVerified;
+	public void setEmailVerification(boolean emailVerification) {
+		this.emailVerification = emailVerification;
 	}
 
 	/**
@@ -119,6 +123,14 @@ public class ServerRequest implements Serializable {
 	 */
 	public void setMobileVerifCode(String mobileVerifCode) {
 		this.mobileVerifCode = mobileVerifCode;
+	}
+
+	/**
+	 * @param mobileVerification
+	 *            the mobileVerification to set
+	 */
+	public void setMobileVerification(boolean mobileVerification) {
+		this.mobileVerification = mobileVerification;
 	}
 
 	/**
