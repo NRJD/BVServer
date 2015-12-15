@@ -3,6 +3,9 @@
  */
 package org.nrjd.bv.server.dto;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Sathya
  * 
@@ -15,7 +18,26 @@ public enum StatusCode {
 	        3008), STATUS_ERROR_EMAIL(3009), STATUS_ERROR_JSON(3010), STATUS_ACCT_ALREADY_VERIFIED(
 	        3011);
 
-	private int	statusCode;
+	private int	                                 statusCode;
+
+	public static final Map<Integer, StatusCode>	lookup	= new HashMap<Integer, StatusCode>();
+	static {
+		for (StatusCode d : StatusCode.values()) {
+			lookup.put(d.getStatusCode(), d);
+		}
+	}
+
+	/**
+	 * Gets the Enum for the given int value
+	 * 
+	 * @param stat
+	 * @return
+	 */
+	public static StatusCode reverseLookup(int stat) {
+
+		return lookup.get(stat);
+
+	}
 
 	StatusCode(int code) {
 

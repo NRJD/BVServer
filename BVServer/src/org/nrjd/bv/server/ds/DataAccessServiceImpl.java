@@ -3,11 +3,12 @@
  */
 package org.nrjd.bv.server.ds;
 
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_STATUS_FROM_DB;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_EMAIL_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_MOBILE_VERIFIED;
-import static org.nrjd.bv.server.dto.ServerConstant.QRY_PERSIST_USER;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_MOBILE;
+import static org.nrjd.bv.server.dto.ServerConstant.SP_PERSIST_USER;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -139,11 +140,18 @@ public class DataAccessServiceImpl {
 	}
 
 	/**
+	 * This method calls the stored procedure to persist the user. The stored
+	 * procedure checks if the Email address already exist in the system, if yes
+	 * then checks whether it has been verified . If verified returns status
+	 * code 3001 (Duplicate Email ID), if the email Address is found but Not
+	 * verified then return 3006 (Email ID not verified). If email is not found
+	 * in database then adds the user to the system and return success status
+	 * 3000.
 	 * 
 	 * @param request
 	 * @throws BVServerDBException
 	 */
-	public StatusCode persistUser(ServerRequest request)
+	public StatusCode registerNewUser(ServerRequest request)
 	        throws BVServerDBException {
 
 		StatusCode code = null;
@@ -151,24 +159,27 @@ public class DataAccessServiceImpl {
 		PreparedStatement ps = null;
 
 		try {
-			ps = connection.prepareStatement(QRY_PERSIST_USER);
+			ps = connection.prepareCall(SP_PERSIST_USER);
 
-			ps.setInt(1, 0);
-			ps.setString(2, request.getName());
-			ps.setString(3, request.getEmailId());
-			ps.setString(4, request.getPassword());
-			ps.setString(5, request.getPhoneNumber());
-			ps.setString(6, request.getLanguage());
-			ps.setInt(7, 0);
-			ps.setString(8, request.getEmailVerifCode());
-			ps.setString(9, request.getMobileVerifCode());
+			ps.setString(1, request.getName());
+			ps.setString(2, request.getEmailId());
+			ps.setString(3, request.getPassword());
+			ps.setString(4, request.getPhoneNumber());
+			ps.setString(5, request.getLanguage());
+			ps.setString(6, request.getEmailVerifCode());
+			ps.setString(7, request.getMobileVerifCode());
 
-			int i = ps.executeUpdate();
+			ps.execute();
 
-			if (i > 0) {
+			ResultSet rs = ps.getResultSet();
+			int dbStatus = 0;
+			while (rs.next()) {
 
-				code = StatusCode.STATUS_USER_ADDED;
+				dbStatus = rs.getInt(OUT_PARAM_STATUS_FROM_DB);
+				System.out.println("OUT_PARAM_STATUS_FROM_DB : " + dbStatus);
+				code = StatusCode.reverseLookup(dbStatus);
 			}
+
 		}
 		catch (SQLException e) {
 			code = handleException(e);

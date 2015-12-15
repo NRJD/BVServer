@@ -20,6 +20,7 @@ public final class ServerConstant {
 	public static String	KEY_LANG	                = "language";
 	public static String	KEY_VERIF_CODE	            = "vCode";
 	public static String	KEY_FLOW	                = "cmd";
+	public static String	OUT_PARAM_STATUS_FROM_DB	= "STATUS_FROM_DB";
 	public static String	CMD_REGISTER	            = "register";
 	public static String	CMD_LOGIN	                = "login";
 	public static String	CMD_ACCT_VERIFY_MOBILE	    = "verifyFromMobile";
@@ -31,7 +32,7 @@ public final class ServerConstant {
 	public static String	EMAIL_ACCT_PWD	            = "jpsgurudev";
 	public static String	EMAIL_SESSION	            = "mail/Session";
 	public static String	EMAIL_CONTEXT	            = "java:comp/env";
-	public static String	QRY_PERSIST_USER	        = "insert into user_login values(?,?,?,?,?,?,?,?,?)";
+	public static String	SP_PERSIST_USER	            = "{CALL usp_user_register(?,?,?,?,?,?,?)}";
 	public static String	QRY_UPDATE_VERIFY_EMAIL	    = "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	QRY_UPDATE_VERIFY_MOBILE	= "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND MOBILE_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	QRY_IS_ACCT_EMAIL_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE EMAIL_VERIF_CODE=? AND EMAIL_ID=?";

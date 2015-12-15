@@ -192,7 +192,8 @@ public class MobileRequestHandler {
 			srvrReq.setEmailVerifCode(emailVerifCode);
 			srvrReq.setMobileVerifCode(String.valueOf(mobVerifCode));
 
-			status = new DataAccessServiceImpl().persistUser(srvrReq);
+			// status = new DataAccessServiceImpl().persistUser(srvrReq);
+			status = new DataAccessServiceImpl().registerNewUser(srvrReq);
 
 			if (status != null && status == StatusCode.STATUS_USER_ADDED) {
 
@@ -213,7 +214,7 @@ public class MobileRequestHandler {
 
 	/**
 	 * This method verifies the Account subscription request receievd from
-	 * Mobiel using the Email ID and Mobile Verification Code.
+	 * Mobile using the Email ID and Mobile Verification Code.
 	 * 
 	 * @param request
 	 * @throws BVServerDBException
