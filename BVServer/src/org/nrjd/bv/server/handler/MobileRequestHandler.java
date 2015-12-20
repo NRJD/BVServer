@@ -5,6 +5,8 @@ package org.nrjd.bv.server.handler;
 
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_ACCT_VERIFY_MOBILE;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_REGISTER;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
@@ -33,6 +35,7 @@ import org.nrjd.bv.server.ds.DataAccessServiceImpl;
 import org.nrjd.bv.server.dto.BVServerException;
 import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.StatusCode;
+import org.nrjd.bv.server.util.CommonUtility;
 import org.nrjd.bv.server.util.EmailUtil;
 import org.nrjd.bv.server.util.JSONHelper;
 
@@ -82,6 +85,52 @@ public class MobileRequestHandler {
 	}
 
 	/**
+	 * This method reset and updates te password requests.
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	private String processPasswordUpdate(JSONObject json) {
+
+		System.out.println(">>> processPasswordUpdate");
+		StatusCode status = null;
+		String jsonResponse = null;
+		String email = null;
+		String tempPassword = null;
+		try {
+			email = (String) json.get(KEY_EMAIL_ID);
+			String flowCommand = (String) json.get(KEY_FLOW);
+
+			ServerRequest srvrReq = new ServerRequest();
+			srvrReq.setEmailId(email);
+			srvrReq.setTempPwd(CommonUtility.generateTempPassword());
+			srvrReq.setCommandFlow(flowCommand);
+
+			status = new DataAccessServiceImpl().resetPassword(srvrReq);
+
+			if (status == StatusCode.ACCT_VERIFIED) {
+
+				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_WELCOME);
+			}
+		}
+		catch (BVServerDBException e) {
+			e.printStackTrace();
+			status = StatusCode.ERROR_DB;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			status = StatusCode.ERROR_SERVER;
+		}
+		Map<String, String> resMap = new TreeMap<String, String>();
+		resMap.put(KEY_EMAIL_ID, email);
+		resMap.put(KEY_VERIF_CODE, tempPassword);
+		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
+
+		System.out.println("<<< processPasswordUpdate " + jsonResponse);
+		return jsonResponse;
+	}
+
+	/**
 	 * This process the request and based on the Request dispatch Path delegates
 	 * to the respective flow like User REgistry, Email Verification, Password
 	 * Reset, Update profile ,download books, etc
@@ -107,6 +156,7 @@ public class MobileRequestHandler {
 
 				if (CMD_REGISTER.equals(flowCommand)) {
 
+					// TODO validate the input
 					jsonResponse = registerUser(json);
 				}
 
@@ -114,12 +164,17 @@ public class MobileRequestHandler {
 
 					jsonResponse = verifyAcctFromMobile(json);
 				}
+				if (CMD_UPDATE_PWD.equals(flowCommand)
+				        || CMD_RESET_PWD.equals(flowCommand)) {
+
+					jsonResponse = processPasswordUpdate(json);
+				}
 			}
 		}
 		catch (BVServerException e) {
 			e.printStackTrace();
 			jsonResponse = JSONHelper.getJSonResponse(null,
-			        StatusCode.STATUS_ERROR_SERVER);
+			        StatusCode.ERROR_SERVER);
 		}
 
 		System.out.println("<<< processRequest " + jsonResponse);
@@ -192,17 +247,16 @@ public class MobileRequestHandler {
 			srvrReq.setEmailVerifCode(emailVerifCode);
 			srvrReq.setMobileVerifCode(String.valueOf(mobVerifCode));
 
-			// status = new DataAccessServiceImpl().persistUser(srvrReq);
 			status = new DataAccessServiceImpl().registerNewUser(srvrReq);
 
-			if (status != null && status == StatusCode.STATUS_USER_ADDED) {
+			if (status != null && status == StatusCode.USER_ADDED) {
 
 				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_VER_EMAIL);
 			}
 		}
 		catch (BVServerDBException e) {
 			e.printStackTrace();
-			status = StatusCode.STATUS_ERROR_DB;
+			status = StatusCode.ERROR_DB;
 		}
 		Map<String, String> resMap = new TreeMap<String, String>();
 		resMap.put(KEY_EMAIL_ID, email);
@@ -237,14 +291,14 @@ public class MobileRequestHandler {
 
 			status = new DataAccessServiceImpl().verifySubscription(srvrReq);
 
-			if (status == StatusCode.STATUS_ACCT_VERIFIED) {
+			if (status == StatusCode.ACCT_VERIFIED) {
 
 				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_WELCOME);
 			}
 		}
 		catch (BVServerDBException e) {
 			e.printStackTrace();
-			status = StatusCode.STATUS_ERROR_DB;
+			status = StatusCode.ERROR_DB;
 		}
 		Map<String, String> resMap = new TreeMap<String, String>();
 		resMap.put(KEY_EMAIL_ID, email);
@@ -254,4 +308,5 @@ public class MobileRequestHandler {
 		System.out.println("<<< verifyAcctFromMobile " + jsonResponse);
 		return jsonResponse;
 	}
+
 }

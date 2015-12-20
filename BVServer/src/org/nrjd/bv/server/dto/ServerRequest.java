@@ -21,6 +21,16 @@ public class ServerRequest implements Serializable {
 	private String	          mobileVerifCode;
 	private boolean	          mobileVerification;
 	private boolean	          emailVerification;
+	private String	          tempPwd;
+	private boolean	          resetPwdEnabled;
+	private String	          commandFlow;
+
+	/**
+	 * @return the commandFlow
+	 */
+	public String getCommandFlow() {
+		return commandFlow;
+	}
 
 	/**
 	 * @return the emailId
@@ -72,6 +82,13 @@ public class ServerRequest implements Serializable {
 	}
 
 	/**
+	 * @return the tempPwd
+	 */
+	public String getTempPwd() {
+		return tempPwd;
+	}
+
+	/**
 	 * @return the emailVerification
 	 */
 	public boolean isEmailVerification() {
@@ -83,6 +100,21 @@ public class ServerRequest implements Serializable {
 	 */
 	public boolean isMobileVerification() {
 		return mobileVerification;
+	}
+
+	/**
+	 * @return the resetPwdEnabled
+	 */
+	public boolean isResetPwdEnabled() {
+		return resetPwdEnabled;
+	}
+
+	/**
+	 * @param commandFlow
+	 *            the commandFlow to set
+	 */
+	public void setCommandFlow(String commandFlow) {
+		this.commandFlow = commandFlow;
 	}
 
 	/**
@@ -155,6 +187,22 @@ public class ServerRequest implements Serializable {
 	 */
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
+	}
+
+	/**
+	 * @param resetPwdEnabled
+	 *            the resetPwdEnabled to set
+	 */
+	public void setResetPwdEnabled(boolean resetPwdEnabled) {
+		this.resetPwdEnabled = resetPwdEnabled;
+	}
+
+	/**
+	 * @param tempPwd
+	 *            the tempPwd to set
+	 */
+	public void setTempPwd(String tempPwd) {
+		this.tempPwd = tempPwd;
 	}
 
 }

@@ -3,9 +3,12 @@
  */
 package org.nrjd.bv.server.ds;
 
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_STATUS_FROM_DB;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_EMAIL_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_MOBILE_VERIFIED;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_MOBILE;
 import static org.nrjd.bv.server.dto.ServerConstant.SP_PERSIST_USER;
@@ -94,7 +97,7 @@ public class DataAccessServiceImpl {
 
 			if (e.getMessage() != null
 			        && e.getMessage().contains("EMAIL_ID_UNIQUE")) {
-				code = StatusCode.STATUS_DUPL_EMAILID;
+				code = StatusCode.DUPL_EMAILID;
 			}
 			else {
 				e.printStackTrace();
@@ -195,6 +198,52 @@ public class DataAccessServiceImpl {
 	 * @param request
 	 * @throws BVServerDBException
 	 */
+	public StatusCode resetPassword(ServerRequest request)
+	        throws BVServerDBException {
+
+		StatusCode code = null;
+		getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			StringBuffer qry = new StringBuffer();
+			qry.append(QRY_UPDATE_PWD);
+			int resetEnabled = 0;
+			if (CMD_RESET_PWD.equals(request.getCommandFlow())) {
+
+				resetEnabled = 1;
+			}
+			else if (CMD_UPDATE_PWD.equals(request.getCommandFlow())) {
+
+				qry.append(" AND PASSWORD = ?");
+			}
+			ps = connection.prepareStatement(qry.toString());
+			ps.setString(1, request.getTempPwd());
+			ps.setInt(2, resetEnabled);
+			ps.setString(3, request.getEmailId());
+
+			if (CMD_UPDATE_PWD.equals(request.getCommandFlow())) {
+
+				ps.setString(4, request.getTempPwd());
+			}
+
+			ps.executeUpdate();
+
+		}
+		catch (SQLException e) {
+			code = handleException(e);
+		}
+		finally {
+			closeConnection(ps);
+		}
+		return code;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
 	public StatusCode verifySubscription(ServerRequest request)
 	        throws BVServerDBException {
 
@@ -221,14 +270,14 @@ public class DataAccessServiceImpl {
 
 				if (i > 0) {
 
-					code = StatusCode.STATUS_ACCT_VERIFIED;
+					code = StatusCode.ACCT_VERIFIED;
 				}
 				else {
-					code = StatusCode.STATUS_ACCT_NOT_VERIFIED;
+					code = StatusCode.ACCT_NOT_VERIFIED;
 				}
 			}
 			else {
-				code = StatusCode.STATUS_ACCT_ALREADY_VERIFIED;
+				code = StatusCode.ACCT_ALREADY_VERIFIED;
 			}
 
 		}

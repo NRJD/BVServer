@@ -61,7 +61,7 @@ public class VerifyEmailServlet extends HttpServlet {
 
 				code = new DataAccessServiceImpl().verifySubscription(dbReq);
 
-				if (code == StatusCode.STATUS_ACCT_VERIFIED) {
+				if (code == StatusCode.ACCT_VERIFIED) {
 
 					EmailUtil.sendEmail(dbReq, EMAIL_SUBJECT_WELCOME);
 					isSuccess = true;
@@ -75,7 +75,7 @@ public class VerifyEmailServlet extends HttpServlet {
 			response.sendRedirect("VerifyEmailSuccess.jsp");
 		}
 		else {
-			String reDirectPage = code == StatusCode.STATUS_ACCT_ALREADY_VERIFIED ? "DupVerifyEmail.jsp"
+			String reDirectPage = code == StatusCode.ACCT_ALREADY_VERIFIED ? "DupVerifyEmail.jsp"
 			        : "VerifyEmailFailed.jsp";
 			response.sendRedirect(reDirectPage);
 		}
