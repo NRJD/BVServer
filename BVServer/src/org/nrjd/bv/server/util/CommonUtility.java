@@ -159,6 +159,18 @@ public class CommonUtility {
 		case 3023:
 			desc = "Validation Failed.User is not registered.Verify the data you have submitted";
 			break;
+		case 3024:
+			desc = "Request for Password Reset is Successful. Please check your email.";
+			break;
+		case 3025:
+			desc = "Update Password is Successful.";
+			break;
+		case 3026:
+			desc = "Request for Password Reset is Failed. Contact support team";
+			break;
+		case 3027:
+			desc = "Update Password is Failed. Contact support team";
+			break;
 		}
 
 		return desc;

@@ -7,6 +7,7 @@ import static org.nrjd.bv.server.dto.ServerConstant.CMD_ACCT_VERIFY_MOBILE;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_REGISTER;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_PWD_RESET;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
@@ -15,6 +16,8 @@ import static org.nrjd.bv.server.dto.ServerConstant.KEY_LANG;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_NAME;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_PHONE;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD_RESET_ENABLED;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_TEMP_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
 import java.io.BufferedReader;
@@ -97,20 +100,39 @@ public class MobileRequestHandler {
 		String jsonResponse = null;
 		String email = null;
 		String tempPassword = null;
+		String password = null;
+		boolean pwdResetEnabled = false;
 		try {
 			email = (String) json.get(KEY_EMAIL_ID);
-			String flowCommand = (String) json.get(KEY_FLOW);
+			String commandFlow = (String) json.get(KEY_FLOW);
 
+			if (CMD_RESET_PWD.equals(commandFlow)) {
+				tempPassword = CommonUtility.generateTempPassword();
+			}
+			else {
+				tempPassword = (String) json.get(KEY_TEMP_PWD);
+				password = (String) json.get(KEY_PWD);// this is new password
+			}
 			ServerRequest srvrReq = new ServerRequest();
 			srvrReq.setEmailId(email);
-			srvrReq.setTempPwd(CommonUtility.generateTempPassword());
-			srvrReq.setCommandFlow(flowCommand);
+			srvrReq.setCommandFlow(commandFlow);
+			srvrReq.setTempPwd(tempPassword);
+			srvrReq.setPassword(password);
 
 			status = new DataAccessServiceImpl().resetPassword(srvrReq);
 
-			if (status == StatusCode.ACCT_VERIFIED) {
+			if (status == StatusCode.PWD_RESET_ENABLED) {
 
-				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_WELCOME);
+				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_PWD_RESET);
+				pwdResetEnabled = true;
+			}
+			else if (status == StatusCode.PWD_UPDATED_SUCCESS) {
+
+				pwdResetEnabled = false;
+			}
+			else if (status == StatusCode.PWD_UPDATE_FAILED) {
+
+				pwdResetEnabled = true;
 			}
 		}
 		catch (BVServerDBException e) {
@@ -123,7 +145,8 @@ public class MobileRequestHandler {
 		}
 		Map<String, String> resMap = new TreeMap<String, String>();
 		resMap.put(KEY_EMAIL_ID, email);
-		resMap.put(KEY_VERIF_CODE, tempPassword);
+		resMap.put(KEY_TEMP_PWD, tempPassword);
+		resMap.put(KEY_PWD_RESET_ENABLED, Boolean.toString(pwdResetEnabled));
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
 		System.out.println("<<< processPasswordUpdate " + jsonResponse);

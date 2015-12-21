@@ -11,12 +11,16 @@ public final class ServerConstant {
 
 	public static String	EMAIL_SUBJECT_VER_EMAIL	    = "Bhakthi Vriksha App - Please Verify Your Subscription";
 	public static String	EMAIL_SUBJECT_WELCOME	    = "Welcome to Bhakti Vrishna";
+	public static String	EMAIL_SUBJECT_PWD_RESET	    = "Bhakthi Vriksha App - Reset Password Requested";
+	public static String	EMAIL_SUPPORT	            = "iskcon.nrjd.support@gmail.com";
 	public static String	KEY_CODE	                = "code";
 	public static String	KEY_MSG	                    = "msg";
 	public static String	KEY_EMAIL_ID	            = "email";
 	public static String	KEY_NAME	                = "name";
 	public static String	KEY_PHONE	                = "phoneNum";
 	public static String	KEY_PWD	                    = "password";
+	public static String	KEY_TEMP_PWD	            = "tempPassword";
+	public static String	KEY_PWD_RESET_ENABLED	    = "resetPwdEnabled";
 	public static String	KEY_LANG	                = "language";
 	public static String	KEY_VERIF_CODE	            = "vCode";
 	public static String	KEY_FLOW	                = "cmd";

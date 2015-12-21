@@ -9,7 +9,10 @@ import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_CONTEXT;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_GMAIL_HOST;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_GMAIL_PORT;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SESSION;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_PWD_RESET;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUPPORT;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
@@ -43,10 +46,14 @@ public class EmailUtil {
 	 * 
 	 * @return
 	 */
-	private static String getBodyHeader() {
+	private static String getBodyHeader(String name) {
 		StringBuffer buf = new StringBuffer();
-		buf.append("<html><head><meta charset=\"ISO-8859-1\"></head><body><h4>Hare Krishna Devotee,</h4>");
-		buf.append("<p>All Glories To Srila Prabhupada.<br></br>All Glories To Sri Guru and Gauranga.</p>");
+		buf.append("<html><head><meta charset=\"ISO-8859-1\">");
+		buf.append("</head><body><h4>Dear ").append(
+		        name != null ? name : "Devotee");
+		buf.append("</h4> Hare Krishna,");
+		buf.append("<p>Please accept our respectful obeisances.<br></br>");
+		buf.append("All Glories To Srila Prabhupada.<br></br>All Glories To Sri Guru and Gauranga.</p><br></br>");
 		return buf.toString();
 	}
 
@@ -57,7 +64,7 @@ public class EmailUtil {
 	 */
 	private static String getBodyTrailer() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("<p><b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b><br>Bhakti Vriksha Team</p></body></html>");
+		buf.append("<br></br><p><b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b><br>Your Humble Servant,<br></br>Bhakti Vriksha Team</p></body></html>");
 		return buf.toString();
 	}
 
@@ -91,26 +98,53 @@ public class EmailUtil {
 	}
 
 	/**
+	 * Email body for the Pasword Reset Email
 	 * 
 	 * @param email
 	 * @param emailVerifCode
 	 * @param mobileVerifCode
 	 * @return
 	 */
-	public static String getVerifEmailBody(String toEmailId,
-	        String emailVerifCode, String mobileVerifCode) {
+	private static String getPwdResetEmailBody(ServerRequest srvrReq) {
 
 		StringBuffer buf = new StringBuffer();
-		buf.append(getBodyHeader());
+		buf.append(getBodyHeader(srvrReq.getName()));
+		buf.append("<p>This email has been sent to you as per your request to reset your Bhakthi Vriksha Mobile App User Account password.");
+		buf.append("In order to complete the password reset process, you must enter the temporary password :");
+		buf.append("<b>").append(srvrReq.getTempPwd()).append("</b>");
+		buf.append(" from your Bhakthi Vriksha Mobile App.</p><br></br><br></br>");
+		buf.append(
+		        "<b>Note:</b><br></br>If you did not request a reset password, please email to:<b>")
+		        .append(EMAIL_SUPPORT).append("</b>");
+		buf.append(getBodyTrailer());
+
+		return buf.toString();
+	}
+
+	/**
+	 * Email body for the Subscription Email
+	 * 
+	 * @param email
+	 * @param emailVerifCode
+	 * @param mobileVerifCode
+	 * @return
+	 */
+	private static String getVerifEmailBody(ServerRequest srvrReq) {
+
+		StringBuffer buf = new StringBuffer();
+		buf.append(getBodyHeader(srvrReq.getName()));
 		buf.append("<br>Thanks for showing interest to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></br>");
 		buf.append("<p>Please ");
 		buf.append("<a href=\"http://localhost:8011/BVServer/VerifyEmail.jsp?");
-		buf.append(KEY_VERIF_CODE).append("=").append(emailVerifCode);
-		buf.append("&").append(KEY_EMAIL_ID).append("=").append(toEmailId);
+		buf.append(KEY_VERIF_CODE).append("=")
+		        .append(srvrReq.getEmailVerifCode());
+		buf.append("&").append(KEY_EMAIL_ID).append("=")
+		        .append(srvrReq.getEmailId());
 		buf.append("\">click Here</a>");
 		buf.append(" to activate your account.</p>");
 		buf.append("<h5>OR</h5><p>You can also verify your email address thru Bhakti Vriksha application in your mobile by entering the 6 digit code: ");
-		buf.append("<b>").append(mobileVerifCode).append("</b></p>");
+		buf.append("<b>").append(srvrReq.getMobileVerifCode())
+		        .append("</b></p>");
 		buf.append(getBodyTrailer());
 
 		return buf.toString();
@@ -123,15 +157,15 @@ public class EmailUtil {
 	 * @param mobileVerifCode
 	 * @return
 	 */
-	public static String getWelcomeEmailBody() {
+	public static String getWelcomeEmailBody(ServerRequest srverReq) {
 
 		StringBuffer buf = new StringBuffer();
-		buf.append(getBodyHeader());
+		buf.append(getBodyHeader(srverReq.getName()));
 		buf.append("<br></br><p>Welcome to BV App to experience spiritual bliss and gain the <b>Ultimate Knowledge.</b></p>");
 		buf.append("<br></br<p>Please use the BV app from your smart phone to enjoy reading the BV manual at your ease</p><br></br>");
 		buf.append(
 		        "<p>If you have any questions or feedback please email to <b>")
-		        .append(EMAIL_ACCT_ID).append("</b> </p><br></br>");
+		        .append(EMAIL_SUPPORT).append("</b> </p><br></br>");
 		buf.append(getBodyTrailer());
 
 		return buf.toString();
@@ -159,9 +193,17 @@ public class EmailUtil {
 			message.setRecipients(Message.RecipientType.TO, to);
 			message.setSubject(subject);
 
-			String body = subject == EMAIL_SUBJECT_VER_EMAIL ? getVerifEmailBody(
-			        srvrReq.getEmailId(), srvrReq.getEmailVerifCode(),
-			        srvrReq.getMobileVerifCode()) : getWelcomeEmailBody();
+			String body = null;
+
+			if (subject == EMAIL_SUBJECT_VER_EMAIL) {
+				body = getVerifEmailBody(srvrReq);
+			}
+			else if (subject == EMAIL_SUBJECT_WELCOME) {
+				body = getWelcomeEmailBody(srvrReq);
+			}
+			else if (subject == EMAIL_SUBJECT_PWD_RESET) {
+				body = getPwdResetEmailBody(srvrReq);
+			}
 
 			message.setContent(body, "text/html;charset=UTF-8");
 

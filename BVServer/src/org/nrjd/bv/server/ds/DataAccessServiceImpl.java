@@ -218,7 +218,11 @@ public class DataAccessServiceImpl {
 				qry.append(" AND PASSWORD = ?");
 			}
 			ps = connection.prepareStatement(qry.toString());
-			ps.setString(1, request.getTempPwd());
+
+			String param1 = CMD_RESET_PWD.equals(request.getCommandFlow()) ? request
+			        .getTempPwd() : request.getPassword();
+
+			ps.setString(1, param1);
 			ps.setInt(2, resetEnabled);
 			ps.setString(3, request.getEmailId());
 
@@ -227,7 +231,18 @@ public class DataAccessServiceImpl {
 				ps.setString(4, request.getTempPwd());
 			}
 
-			ps.executeUpdate();
+			int result = ps.executeUpdate();
+
+			if (CMD_RESET_PWD.equals(request.getCommandFlow())) {
+
+				code = result == 1 ? StatusCode.PWD_RESET_ENABLED
+				        : StatusCode.PWD_RESET_FAILED;
+			}
+			else {
+
+				code = result == 1 ? StatusCode.PWD_UPDATED_SUCCESS
+				        : StatusCode.PWD_UPDATE_FAILED;
+			}
 
 		}
 		catch (SQLException e) {
