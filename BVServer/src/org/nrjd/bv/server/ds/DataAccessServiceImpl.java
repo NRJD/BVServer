@@ -171,6 +171,7 @@ public class DataAccessServiceImpl {
 			ps.setString(5, request.getLanguage());
 			ps.setString(6, request.getEmailVerifCode());
 			ps.setString(7, request.getMobileVerifCode());
+			ps.setString(8, request.getCountryCode());
 
 			ps.execute();
 
@@ -194,6 +195,8 @@ public class DataAccessServiceImpl {
 	}
 
 	/**
+	 * This method resets the password to temp and updates the password to user
+	 * defined one
 	 * 
 	 * @param request
 	 * @throws BVServerDBException
@@ -208,6 +211,69 @@ public class DataAccessServiceImpl {
 		try {
 			StringBuffer qry = new StringBuffer();
 			qry.append(QRY_UPDATE_PWD);
+			int resetEnabled = 0;
+			if (CMD_RESET_PWD.equals(request.getCommandFlow())) {
+
+				resetEnabled = 1;
+			}
+			else if (CMD_UPDATE_PWD.equals(request.getCommandFlow())) {
+
+				qry.append(" AND PASSWORD = ?");
+			}
+			ps = connection.prepareStatement(qry.toString());
+
+			String param1 = CMD_RESET_PWD.equals(request.getCommandFlow()) ? request
+			        .getTempPwd() : request.getPassword();
+
+			ps.setString(1, param1);
+			ps.setInt(2, resetEnabled);
+			ps.setString(3, request.getEmailId());
+
+			if (CMD_UPDATE_PWD.equals(request.getCommandFlow())) {
+
+				ps.setString(4, request.getTempPwd());
+			}
+
+			int result = ps.executeUpdate();
+
+			if (CMD_RESET_PWD.equals(request.getCommandFlow())) {
+
+				code = result == 1 ? StatusCode.PWD_RESET_ENABLED
+				        : StatusCode.PWD_RESET_FAILED;
+			}
+			else {
+
+				code = result == 1 ? StatusCode.PWD_UPDATED_SUCCESS
+				        : StatusCode.PWD_UPDATE_FAILED;
+			}
+
+		}
+		catch (SQLException e) {
+			code = handleException(e);
+		}
+		finally {
+			closeConnection(ps);
+		}
+		return code;
+	}
+
+	/**
+	 * This method updates the Name, Mobile, Country Code and Language
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	public StatusCode updateProfile(ServerRequest request)
+	        throws BVServerDBException {
+
+		StatusCode code = null;
+		getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			StringBuffer qry = new StringBuffer();
+			qry.append("UPDATE user_login SET ");
+			qry.append("NAME = ?");
 			int resetEnabled = 0;
 			if (CMD_RESET_PWD.equals(request.getCommandFlow())) {
 

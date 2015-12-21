@@ -24,12 +24,20 @@ public class ServerRequest implements Serializable {
 	private String	          tempPwd;
 	private boolean	          resetPwdEnabled;
 	private String	          commandFlow;
+	private String	          countryCode;
 
 	/**
 	 * @return the commandFlow
 	 */
 	public String getCommandFlow() {
 		return commandFlow;
+	}
+
+	/**
+	 * @return the countryCode
+	 */
+	public String getCountryCode() {
+		return countryCode;
 	}
 
 	/**
@@ -115,6 +123,14 @@ public class ServerRequest implements Serializable {
 	 */
 	public void setCommandFlow(String commandFlow) {
 		this.commandFlow = commandFlow;
+	}
+
+	/**
+	 * @param countryCode
+	 *            the countryCode to set
+	 */
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
 	}
 
 	/**

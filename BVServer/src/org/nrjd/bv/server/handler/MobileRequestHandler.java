@@ -10,6 +10,7 @@ import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_PWD_RESET;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_COUNTRY_CODE;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_FLOW;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_LANG;
@@ -87,8 +88,35 @@ public class MobileRequestHandler {
 		}
 	}
 
+	private ServerRequest populateRequestFromJson(JSONObject json) {
+
+		ServerRequest srvrReq = new ServerRequest();
+
+		String name = (String) json.get(KEY_NAME);
+		String pwd = (String) json.get(KEY_PWD);
+		String email = (String) json.get(KEY_EMAIL_ID);
+		String lang = (String) json.get(KEY_LANG);
+		String mobile = (String) json.get(KEY_PHONE);
+		String countryCode = (String) json.get(KEY_COUNTRY_CODE);
+		String mobVerifCode = (String) json.get(KEY_VERIF_CODE);
+		String tempPassword = (String) json.get(KEY_TEMP_PWD);
+		String commandFlow = (String) json.get(KEY_FLOW);
+
+		srvrReq.setCommandFlow(commandFlow);
+		srvrReq.setCountryCode(countryCode);
+		srvrReq.setEmailId(email);
+		srvrReq.setLanguage(lang);
+		srvrReq.setMobileVerifCode(mobVerifCode);
+		srvrReq.setName(name);
+		srvrReq.setPassword(pwd);
+		srvrReq.setPhoneNumber(mobile);
+		srvrReq.setTempPwd(tempPassword);
+
+		return srvrReq;
+	}
+
 	/**
-	 * This method reset and updates te password requests.
+	 * This method reset and updates the password requests.
 	 * 
 	 * @param request
 	 * @throws BVServerDBException
@@ -168,7 +196,6 @@ public class MobileRequestHandler {
 
 		System.out.println(">>> processRequest");
 		String jsonResponse = null;
-		String requestURI = request.getRequestURI();
 
 		try {
 			JSONObject json = readData(request);
@@ -183,12 +210,16 @@ public class MobileRequestHandler {
 					jsonResponse = registerUser(json);
 				}
 
-				if (CMD_ACCT_VERIFY_MOBILE.equals(flowCommand)) {
+				else if (CMD_ACCT_VERIFY_MOBILE.equals(flowCommand)) {
 
 					jsonResponse = verifyAcctFromMobile(json);
 				}
-				if (CMD_UPDATE_PWD.equals(flowCommand)
+				else if (CMD_UPDATE_PWD.equals(flowCommand)
 				        || CMD_RESET_PWD.equals(flowCommand)) {
+
+					jsonResponse = processPasswordUpdate(json);
+				}
+				else if (CMD_UPDATE_PWD.equals(flowCommand)) {
 
 					jsonResponse = processPasswordUpdate(json);
 				}
@@ -255,6 +286,7 @@ public class MobileRequestHandler {
 			email = (String) json.get(KEY_EMAIL_ID);
 			String lang = (String) json.get(KEY_LANG);
 			String mobile = (String) json.get(KEY_PHONE);
+			String countryCode = (String) json.get(KEY_COUNTRY_CODE);
 
 			UUID uuid = UUID.randomUUID();
 			String emailVerifCode = uuid.toString().replaceAll("-", "")
@@ -269,6 +301,7 @@ public class MobileRequestHandler {
 			srvrReq.setPhoneNumber(mobile);
 			srvrReq.setEmailVerifCode(emailVerifCode);
 			srvrReq.setMobileVerifCode(String.valueOf(mobVerifCode));
+			srvrReq.setCountryCode(countryCode);
 
 			status = new DataAccessServiceImpl().registerNewUser(srvrReq);
 
@@ -286,6 +319,39 @@ public class MobileRequestHandler {
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
 		System.out.println("<<< registerUser " + jsonResponse);
+		return jsonResponse;
+	}
+
+	/**
+	 * This method updates the Name, Mobile Number, Country Code, Language
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	private String updateProfile(JSONObject json) {
+
+		System.out.println(">>> updateProfile");
+		StatusCode status = null;
+		String jsonResponse = null;
+		ServerRequest srvrReq = null;
+		try {
+			srvrReq = populateRequestFromJson(json);
+
+			status = new DataAccessServiceImpl().resetPassword(srvrReq);
+		}
+		catch (BVServerDBException e) {
+			e.printStackTrace();
+			status = StatusCode.ERROR_DB;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			status = StatusCode.ERROR_SERVER;
+		}
+		Map<String, String> resMap = new TreeMap<String, String>();
+		resMap.put(KEY_EMAIL_ID, srvrReq.getEmailId());
+		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
+
+		System.out.println("<<< updateProfile " + jsonResponse);
 		return jsonResponse;
 	}
 
