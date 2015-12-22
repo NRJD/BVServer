@@ -41,6 +41,7 @@ public final class ServerConstant {
 	public static String	SP_PERSIST_USER	            = "{CALL usp_user_register(?,?,?,?,?,?,?,?)}";
 	public static String	QRY_UPDATE_VERIFY_EMAIL	    = "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	QRY_UPDATE_VERIFY_MOBILE	= "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND MOBILE_VERIF_CODE=? AND EMAIL_ID=?";
+	public static String	QRY_UPDATE_PROFILE	        = "UPDATE user_login SET NAME = ?, MOBILE_NUMBER = ?, LANGUAGE = ?, COUNTRY_CODE = ? WHERE EMAIL_ID = ?";
 	public static String	QRY_UPDATE_PWD	            = "UPDATE user_login SET PASSWORD = ?, PWD_RESET_ENABLED = ? WHERE EMAIL_ID = ?";
 	public static String	QRY_IS_ACCT_EMAIL_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	QRY_IS_ACCT_MOBILE_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE MOBILE_VERIF_CODE=? AND EMAIL_ID=?";

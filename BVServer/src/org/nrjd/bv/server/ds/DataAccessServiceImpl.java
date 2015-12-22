@@ -8,6 +8,7 @@ import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_STATUS_FROM_DB;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_EMAIL_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_MOBILE_VERIFIED;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_PROFILE;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_MOBILE;
@@ -85,13 +86,13 @@ public class DataAccessServiceImpl {
 	private StatusCode handleException(SQLException e)
 	        throws BVServerDBException {
 
-		StatusCode code = null;
+		StatusCode code = StatusCode.ERROR_DB;
 		try {
 			connection.rollback();
 
 		}
 		catch (SQLException e1) {
-			// Ignore the Exception
+			e1.printStackTrace();
 		}
 		finally {
 
@@ -271,45 +272,16 @@ public class DataAccessServiceImpl {
 		PreparedStatement ps = null;
 
 		try {
-			StringBuffer qry = new StringBuffer();
-			qry.append("UPDATE user_login SET ");
-			qry.append("NAME = ?");
-			int resetEnabled = 0;
-			if (CMD_RESET_PWD.equals(request.getCommandFlow())) {
+			ps = connection.prepareStatement(QRY_UPDATE_PROFILE);
 
-				resetEnabled = 1;
-			}
-			else if (CMD_UPDATE_PWD.equals(request.getCommandFlow())) {
-
-				qry.append(" AND PASSWORD = ?");
-			}
-			ps = connection.prepareStatement(qry.toString());
-
-			String param1 = CMD_RESET_PWD.equals(request.getCommandFlow()) ? request
-			        .getTempPwd() : request.getPassword();
-
-			ps.setString(1, param1);
-			ps.setInt(2, resetEnabled);
-			ps.setString(3, request.getEmailId());
-
-			if (CMD_UPDATE_PWD.equals(request.getCommandFlow())) {
-
-				ps.setString(4, request.getTempPwd());
-			}
-
-			int result = ps.executeUpdate();
-
-			if (CMD_RESET_PWD.equals(request.getCommandFlow())) {
-
-				code = result == 1 ? StatusCode.PWD_RESET_ENABLED
-				        : StatusCode.PWD_RESET_FAILED;
-			}
-			else {
-
-				code = result == 1 ? StatusCode.PWD_UPDATED_SUCCESS
-				        : StatusCode.PWD_UPDATE_FAILED;
-			}
-
+			ps.setString(1, request.getName());
+			ps.setString(2, request.getPhoneNumber());
+			ps.setString(3, request.getLanguage());
+			ps.setString(4, request.getCountryCode());
+			ps.setString(5, request.getEmailId());
+			int i = ps.executeUpdate();
+			code = i > 0 ? StatusCode.PROFILE_UPDATE_SUCCESS
+			        : StatusCode.PROFILE_UPDATE_FAILED;
 		}
 		catch (SQLException e) {
 			code = handleException(e);

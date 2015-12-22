@@ -171,6 +171,12 @@ public class CommonUtility {
 		case 3027:
 			desc = "Update Password is Failed. Contact support team";
 			break;
+		case 3028:
+			desc = "User Profile updated successfully.";
+			break;
+		case 3029:
+			desc = "User Profile update Failed. Contact support team";
+			break;
 		}
 
 		return desc;

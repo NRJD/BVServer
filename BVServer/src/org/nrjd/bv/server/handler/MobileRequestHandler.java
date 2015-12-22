@@ -6,6 +6,7 @@ package org.nrjd.bv.server.handler;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_ACCT_VERIFY_MOBILE;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_REGISTER;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PROF;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_PWD_RESET;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
@@ -219,9 +220,9 @@ public class MobileRequestHandler {
 
 					jsonResponse = processPasswordUpdate(json);
 				}
-				else if (CMD_UPDATE_PWD.equals(flowCommand)) {
+				else if (CMD_UPDATE_PROF.equals(flowCommand)) {
 
-					jsonResponse = processPasswordUpdate(json);
+					jsonResponse = updateProfile(json);
 				}
 			}
 		}
@@ -337,7 +338,7 @@ public class MobileRequestHandler {
 		try {
 			srvrReq = populateRequestFromJson(json);
 
-			status = new DataAccessServiceImpl().resetPassword(srvrReq);
+			status = new DataAccessServiceImpl().updateProfile(srvrReq);
 		}
 		catch (BVServerDBException e) {
 			e.printStackTrace();
