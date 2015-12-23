@@ -6,8 +6,6 @@ import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
 import java.io.IOException;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -80,15 +78,6 @@ public class VerifyEmailServlet extends HttpServlet {
 			response.sendRedirect(reDirectPage);
 		}
 		System.out.println("<<< doGet ");
-	}
-
-	/**
-	 * @see Servlet#getServletConfig()
-	 */
-	@Override
-	public ServletConfig getServletConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

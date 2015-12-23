@@ -3,10 +3,30 @@
  */
 package org.nrjd.bv.server.util;
 
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_COUNTRY_CODE;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_FILE_NAME;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_FLOW;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_LANG;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_NAME;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_PHONE;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_TEMP_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.simple.JSONObject;
+import org.nrjd.bv.server.dto.BVServerException;
+import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.StatusCode;
 
 /**
@@ -195,5 +215,113 @@ public class CommonUtility {
 		while (pswd[index = rnd.nextInt(len)] != 0)
 			;
 		return index;
+	}
+
+	/**
+	 * 
+	 * @param inputData
+	 * @return
+	 * @throws IOException
+	 */
+	private static String getRequestData(InputStream inputData)
+	        throws BVServerException {
+
+		InputStreamReader isr = new InputStreamReader(inputData);
+		BufferedReader br = new BufferedReader(isr);
+		try {
+			StringBuffer xmlBuffer = new StringBuffer();
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				xmlBuffer.append(line);
+			}
+			String xmlData = xmlBuffer.toString();
+			System.out.println("XML Request Data: " + xmlData);
+			return xmlData;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new BVServerException(e.getMessage());
+		}
+		finally {
+			try {
+				br.close();
+			}
+			catch (Exception e) { /* Ignore Exception */
+			}
+			try {
+				isr.close();
+			}
+			catch (Exception e) { /* Ignore Exception */
+			}
+		}
+	}
+
+	/**
+	 * This method will populate the ServerRequest with the data retrieved from
+	 * JSON onject
+	 * 
+	 * @param json
+	 * @return
+	 */
+	public static ServerRequest populateRequestFromJson(JSONObject json) {
+
+		ServerRequest srvrReq = new ServerRequest();
+
+		String name = (String) json.get(KEY_NAME);
+		String pwd = (String) json.get(KEY_PWD);
+		String email = (String) json.get(KEY_EMAIL_ID);
+		String lang = (String) json.get(KEY_LANG);
+		String mobile = (String) json.get(KEY_PHONE);
+		String countryCode = (String) json.get(KEY_COUNTRY_CODE);
+		String mobVerifCode = (String) json.get(KEY_VERIF_CODE);
+		String tempPassword = (String) json.get(KEY_TEMP_PWD);
+		String commandFlow = (String) json.get(KEY_FLOW);
+		String fileToDownload = (String) json.get(KEY_FILE_NAME);
+
+		srvrReq.setCommandFlow(commandFlow);
+		srvrReq.setCountryCode(countryCode);
+		srvrReq.setEmailId(email);
+		srvrReq.setLanguage(lang);
+		srvrReq.setMobileVerifCode(mobVerifCode);
+		srvrReq.setName(name);
+		srvrReq.setPassword(pwd);
+		srvrReq.setPhoneNumber(mobile);
+		srvrReq.setTempPwd(tempPassword);
+		srvrReq.setFileName(fileToDownload);
+
+		return srvrReq;
+	}
+
+	/**
+	 * To Read The JSON data
+	 * 
+	 * @param request
+	 * @return
+	 * @throws BVServerException
+	 */
+	public static JSONObject readData(HttpServletRequest request)
+	        throws BVServerException {
+		InputStream is = null;
+		try {
+			is = request.getInputStream();
+			String requestXmlData = getRequestData(is);
+
+			JSONObject json = JSONHelper.parseJSONRequest(requestXmlData);
+			return json;
+		}
+		catch (Exception e) {
+
+			throw new BVServerException(
+			        "Error while retriving the request data", e);
+		}
+		finally {
+			try {
+				is.close();
+			}
+			catch (Exception e) {
+
+				// Ignore the Exception
+			}
+		}
 	}
 }

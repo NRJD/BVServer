@@ -24,6 +24,7 @@ public class ServerRequest implements Serializable {
 	private String	          tempPwd;
 	private boolean	          resetPwdEnabled;
 	private String	          commandFlow;
+	private String	          fileName;
 	private String	          countryCode;
 
 	/**
@@ -52,6 +53,13 @@ public class ServerRequest implements Serializable {
 	 */
 	public String getEmailVerifCode() {
 		return emailVerifCode;
+	}
+
+	/**
+	 * @return the fileName
+	 */
+	public String getFileName() {
+		return fileName;
 	}
 
 	/**
@@ -155,6 +163,14 @@ public class ServerRequest implements Serializable {
 	 */
 	public void setEmailVerification(boolean emailVerification) {
 		this.emailVerification = emailVerification;
+	}
+
+	/**
+	 * @param fileName
+	 *            the fileName to set
+	 */
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	/**

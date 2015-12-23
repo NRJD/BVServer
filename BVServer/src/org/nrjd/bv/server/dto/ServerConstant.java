@@ -25,6 +25,7 @@ public final class ServerConstant {
 	public static String	KEY_LANG	                = "language";
 	public static String	KEY_VERIF_CODE	            = "vCode";
 	public static String	KEY_FLOW	                = "cmd";
+	public static String	KEY_FILE_NAME	            = "fileName";
 	public static String	OUT_PARAM_STATUS_FROM_DB	= "STATUS_FROM_DB";
 	public static String	CMD_REGISTER	            = "register";
 	public static String	CMD_LOGIN	                = "login";
@@ -32,6 +33,7 @@ public final class ServerConstant {
 	public static String	CMD_UPDATE_PWD	            = "updatePassword";
 	public static String	CMD_RESET_PWD	            = "resetPassword";
 	public static String	CMD_UPDATE_PROF	            = "updateProfile";
+	public static String	CMD_DOWNLOAD	            = "download";
 	public static String	EMAIL_GMAIL_HOST	        = "smtp.gmail.com";
 	public static String	EMAIL_GMAIL_PORT	        = "465";
 	public static String	EMAIL_ACCT_ID	            = "bvtestsathya@gmail.com";
