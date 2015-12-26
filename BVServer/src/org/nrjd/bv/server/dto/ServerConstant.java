@@ -42,6 +42,10 @@ public final class ServerConstant {
 	public static String	EMAIL_GMAIL_HOST	        = "smtp.gmail.com";
 	public static String	EMAIL_GMAIL_PORT	        = "465";
 	public static String	EMAIL_ACCT_ID	            = "bvtestsathya@gmail.com";
+	public static String	DB_DRIVER	                = "jdbc:mysql://localhost:3306/";
+	public static String	DB_SCHEMA	                = "bv";
+	public static String	DB_USER_NAME	            = "root";
+	public static String	DB_PWD	                    = "gurudev";
 	public static String	EMAIL_ACCT_PWD	            = "jpsgurudev";
 	public static String	EMAIL_SESSION	            = "mail/Session";
 	public static String	EMAIL_CONTEXT	            = "java:comp/env";

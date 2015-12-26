@@ -5,6 +5,10 @@ package org.nrjd.bv.server.ds;
 
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.DB_DRIVER;
+import static org.nrjd.bv.server.dto.ServerConstant.DB_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.DB_SCHEMA;
+import static org.nrjd.bv.server.dto.ServerConstant.DB_USER_NAME;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_ACCT_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_PWD_RESET_ENABLED;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_STATUS_FROM_DB;
@@ -66,8 +70,9 @@ public class DataAccessServiceImpl {
 			if (connection == null || connection.isClosed()) {
 
 				System.out.println("Connection Established !!!! ");
-				connection = DriverManager.getConnection(
-				        "jdbc:mysql://localhost:3306/bv", "root", "gurudev");
+
+				connection = DriverManager.getConnection(DB_DRIVER + DB_SCHEMA,
+				        DB_USER_NAME, DB_PWD);
 
 			}
 		}
