@@ -4,6 +4,8 @@
 package org.nrjd.bv.server.handler;
 
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_ACCT_VERIFY_MOBILE;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_LOGIN;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_LOGOFF;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_REGISTER;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PROF;
@@ -29,12 +31,14 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.simple.JSONObject;
 import org.nrjd.bv.server.ds.BVServerDBException;
 import org.nrjd.bv.server.ds.DataAccessServiceImpl;
 import org.nrjd.bv.server.dto.BVServerException;
 import org.nrjd.bv.server.dto.ServerRequest;
+import org.nrjd.bv.server.dto.ServerResponse;
 import org.nrjd.bv.server.dto.StatusCode;
 import org.nrjd.bv.server.util.CommonUtility;
 import org.nrjd.bv.server.util.EmailUtil;
@@ -45,6 +49,68 @@ import org.nrjd.bv.server.util.JSONHelper;
  * 
  */
 public class MobileRequestHandler {
+
+	/**
+	 * This method updates the Name, Mobile Number, Country Code, Language
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	private String loginLogOff(JSONObject json, HttpServletRequest request) {
+
+		System.out.println(">>> loginLogOff");
+		StatusCode status = null;
+		String jsonResponse = null;
+		ServerRequest srvrReq = null;
+		boolean isPwdResetEnabled = false;
+		try {
+			srvrReq = CommonUtility.populateRequestFromJson(json);
+
+			if (CMD_LOGIN.equals(srvrReq.getCommandFlow())) {
+
+				ServerResponse srvrResponse = new DataAccessServiceImpl()
+				        .verifyLogin(srvrReq);
+
+				status = srvrResponse.getCode();
+				if (status != StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS) {
+
+					if (!srvrResponse.isAcctVerified()) {
+
+						status = StatusCode.ACCT_NOT_VERIFIED;
+					}
+					else {
+						HttpSession session = request.getSession();
+						session.setAttribute(KEY_EMAIL_ID, srvrReq.getEmailId());
+						status = StatusCode.LOGIN_SUCCESS;
+
+					}
+					isPwdResetEnabled = srvrResponse.isResetPwdEnabled();
+				}
+			}
+			else {
+
+				HttpSession session = request.getSession();
+				session.invalidate();
+				status = StatusCode.LOGOFF_SUCCESS;
+			}
+
+		}
+		catch (BVServerDBException e) {
+			e.printStackTrace();
+			status = StatusCode.ERROR_DB;
+		}
+		catch (Throwable e) {
+			e.printStackTrace();
+			status = StatusCode.ERROR_SERVER;
+		}
+		Map<String, String> resMap = new TreeMap<String, String>();
+		resMap.put(KEY_EMAIL_ID, srvrReq.getEmailId());
+		resMap.put(KEY_PWD_RESET_ENABLED, String.valueOf(isPwdResetEnabled));
+		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
+
+		System.out.println("<<< loginLogOff " + jsonResponse);
+		return jsonResponse;
+	}
 
 	/**
 	 * This method reset and updates the password requests.
@@ -153,6 +219,11 @@ public class MobileRequestHandler {
 				else if (CMD_UPDATE_PROF.equals(flowCommand)) {
 
 					jsonResponse = updateProfile(json);
+				}
+				else if (CMD_LOGIN.equals(flowCommand)
+				        || CMD_LOGOFF.equals(flowCommand)) {
+
+					jsonResponse = loginLogOff(json, request);
 				}
 			}
 		}

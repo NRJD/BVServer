@@ -27,8 +27,13 @@ public final class ServerConstant {
 	public static String	KEY_FLOW	                = "cmd";
 	public static String	KEY_FILE_NAME	            = "fileName";
 	public static String	OUT_PARAM_STATUS_FROM_DB	= "STATUS_FROM_DB";
+	public static String	OUT_PARAM_EMAIL	            = "EMAIL_ID";
+	public static String	OUT_PARAM_PWD	            = "PASSWORD";
+	public static String	OUT_PARAM_ACCT_VERIFIED	    = "ACCT_VERIFIED";
+	public static String	OUT_PARAM_PWD_RESET_ENABLED	= "PWD_RESET_ENABLED";
 	public static String	CMD_REGISTER	            = "register";
 	public static String	CMD_LOGIN	                = "login";
+	public static String	CMD_LOGOFF	                = "logoff";
 	public static String	CMD_ACCT_VERIFY_MOBILE	    = "verifyFromMobile";
 	public static String	CMD_UPDATE_PWD	            = "updatePassword";
 	public static String	CMD_RESET_PWD	            = "resetPassword";
@@ -44,6 +49,7 @@ public final class ServerConstant {
 	public static String	QRY_UPDATE_VERIFY_EMAIL	    = "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	QRY_UPDATE_VERIFY_MOBILE	= "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND MOBILE_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	QRY_UPDATE_PROFILE	        = "UPDATE user_login SET NAME = ?, MOBILE_NUMBER = ?, LANGUAGE = ?, COUNTRY_CODE = ? WHERE EMAIL_ID = ?";
+	public static String	QRY_VERIFY_LOGIN	        = "SELECT ACCT_VERIFIED, PWD_RESET_ENABLED FROM user_login WHERE EMAIL_ID = ? AND PASSWORD = ?";
 	public static String	QRY_UPDATE_PWD	            = "UPDATE user_login SET PASSWORD = ?, PWD_RESET_ENABLED = ? WHERE EMAIL_ID = ?";
 	public static String	QRY_IS_ACCT_EMAIL_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	QRY_IS_ACCT_MOBILE_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE MOBILE_VERIF_CODE=? AND EMAIL_ID=?";

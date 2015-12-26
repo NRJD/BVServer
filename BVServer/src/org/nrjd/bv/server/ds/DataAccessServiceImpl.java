@@ -5,6 +5,8 @@ package org.nrjd.bv.server.ds;
 
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_ACCT_VERIFIED;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_PWD_RESET_ENABLED;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_STATUS_FROM_DB;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_EMAIL_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_MOBILE_VERIFIED;
@@ -12,6 +14,7 @@ import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_PROFILE;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_MOBILE;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_VERIFY_LOGIN;
 import static org.nrjd.bv.server.dto.ServerConstant.SP_PERSIST_USER;
 
 import java.sql.Connection;
@@ -21,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.nrjd.bv.server.dto.ServerRequest;
+import org.nrjd.bv.server.dto.ServerResponse;
 import org.nrjd.bv.server.dto.StatusCode;
 
 /**
@@ -290,6 +294,62 @@ public class DataAccessServiceImpl {
 			closeConnection(ps);
 		}
 		return code;
+	}
+
+	/**
+	 * This method updates the Name, Mobile, Country Code and Language
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	public ServerResponse verifyLogin(ServerRequest request)
+	        throws BVServerDBException {
+
+		getConnection();
+		PreparedStatement ps = null;
+		ServerResponse srvrResponse = null;
+		try {
+
+			ps = connection.prepareStatement(QRY_VERIFY_LOGIN);
+
+			ps.setString(1, request.getEmailId());
+			ps.setString(2, request.getPassword());
+			ps.execute();
+
+			ResultSet rs = ps.getResultSet();
+
+			while (rs.next()) {
+				if (srvrResponse == null) {
+					srvrResponse = new ServerResponse();
+				}
+				int booValue = rs.getInt(OUT_PARAM_ACCT_VERIFIED);
+				srvrResponse.setAcctVerified(booValue == 0 ? false : true);
+
+				booValue = rs.getInt(OUT_PARAM_PWD_RESET_ENABLED);
+				srvrResponse.setResetPwdEnabled(booValue == 0 ? false : true);
+				srvrResponse.setEmailId(request.getEmailId());
+			}
+
+		}
+		catch (SQLException e) {
+
+			if (srvrResponse == null) {
+
+				srvrResponse = new ServerResponse();
+			}
+			srvrResponse.setCode(handleException(e));
+		}
+		finally {
+
+			// that means the emailId/Password did not match
+			if (srvrResponse == null) {
+				srvrResponse = new ServerResponse();
+				srvrResponse
+				        .setCode(StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS);
+			}
+			closeConnection(ps);
+		}
+		return srvrResponse;
 	}
 
 	/**

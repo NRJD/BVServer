@@ -197,6 +197,15 @@ public class CommonUtility {
 		case 3029:
 			desc = "User Profile update Failed. Contact support team";
 			break;
+		case 3030:
+			desc = "Successfully Logged In.";
+			break;
+		case 3031:
+			desc = "Invalid Email Id or Password.";
+			break;
+		case 3032:
+			desc = "Logged Off successfully";
+			break;
 		}
 
 		return desc;
