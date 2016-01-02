@@ -10,8 +10,7 @@ import java.util.Map;
  * @author Sathya
  * 
  */
-public enum StatusCode {
-
+public enum StatusCode {	
 	USER_ADDED(3000), DUPL_EMAILID(3001), EMAIL_UNREGISTERED(3002), INVALID_PWD(
 	        3003), UPDATE_SUCCESS(3004), ACCT_VERIFIED(3005), ACCT_NOT_VERIFIED(
 	        3006), ERROR_DB(3007), ERROR_SERVER(3008), ERROR_EMAIL(3009), ERROR_JSON(
@@ -45,23 +44,20 @@ public enum StatusCode {
 	}
 
 	StatusCode(int code) {
-
-		statusCode = code;
+		this.statusCode = code;
 	}
 
 	/**
 	 * @return the statusCode
 	 */
 	public int getStatusCode() {
-		return statusCode;
+		return this.statusCode;
 	}
 
 	/**
-	 * @param statusCode
-	 *            the statusCode to set
+	 * @return the statusCode
 	 */
-	public void setStatusCode(int statusCode) {
-		this.statusCode = statusCode;
+	public String getStatusId() {
+		return this.name();
 	}
-
 }

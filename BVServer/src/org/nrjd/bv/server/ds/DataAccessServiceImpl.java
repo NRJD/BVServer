@@ -68,12 +68,12 @@ public class DataAccessServiceImpl {
 			Class.forName("com.mysql.jdbc.Driver");
 
 			if (connection == null || connection.isClosed()) {
-
-				System.out.println("Connection Established !!!! ");
-
+				
 				connection = DriverManager.getConnection(DB_DRIVER + DB_SCHEMA,
 				        DB_USER_NAME, DB_PWD);
 
+				System.out.println("Connection Established ! ");
+				
 			}
 		}
 		catch (ClassNotFoundException e) {
