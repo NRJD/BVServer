@@ -16,7 +16,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>HandleRequest</servlet-name>
-    <url-pattern>/register</url-pattern>
+    <url-pattern>/mobileReq</url-pattern>
   </servlet-mapping>
   
   <servlet>
