@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +23,8 @@ public class MobileRequestServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long	serialVersionUID	= 5586492332079327778L;
-	ServletContext	          context;
+
+	private static String	  appEmail;	                                // 4802087613
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -53,7 +53,6 @@ public class MobileRequestServlet extends HttpServlet {
 	        HttpServletResponse response) throws ServletException, IOException {
 
 		System.out.println(">>> doPost ");
-
 		String jsonResponse = new MobileRequestHandler().processRequest(
 		        request, response);
 

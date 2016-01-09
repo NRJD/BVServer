@@ -35,17 +35,17 @@ public class PasswordHandler {
 
 		String generatedSecuredPasswordHash = null;
 		long start = System.currentTimeMillis();
-		// try {
-		// generatedSecuredPasswordHash =
-		// generateStorngPasswordHash(userProvidedPwd);
+		try {
+			generatedSecuredPasswordHash = generateStorngPasswordHash(userProvidedPwd);
 
-		generatedSecuredPasswordHash = getMD5SecurePassword(userProvidedPwd);
-		System.out.println(generatedSecuredPasswordHash);
-		// }
-		// catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
+			// generatedSecuredPasswordHash =
+			// getMD5SecurePassword(userProvidedPwd);
+			System.out.println(generatedSecuredPasswordHash);
+		}
+		catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		long end = System.currentTimeMillis();
 		System.out.println("Total Time for PWD  " + (end - start) + " Ms");
 		return generatedSecuredPasswordHash;
@@ -83,9 +83,9 @@ public class PasswordHandler {
 		PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
 		SecretKeyFactory skf = SecretKeyFactory.getInstance(PWD_ALGO_PBKD);
 		byte[] hash = skf.generateSecret(spec).getEncoded();
-		// return iterations + ":" + toHex(salt) + ":" + toHex(hash);
+		return iterations + ":" + toHex(salt) + ":" + toHex(hash);
 
-		return toHex(salt) + ":" + toHex(hash);
+		// return toHex(salt) + ":" + toHex(hash);
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class PasswordHandler {
 	        InvalidKeySpecException {
 
 		String[] parts = storedPassword.split(":");
-		int iterations = 1971;
+		int iterations = Integer.valueOf(parts[0]);
 		byte[] salt = fromHex(parts[0]);
 		byte[] hash = fromHex(parts[1]);
 

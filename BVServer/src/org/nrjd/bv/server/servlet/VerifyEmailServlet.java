@@ -61,7 +61,7 @@ public class VerifyEmailServlet extends HttpServlet {
 
 				if (code == StatusCode.ACCT_VERIFIED) {
 
-					EmailUtil.sendEmail(dbReq, EMAIL_SUBJECT_WELCOME);
+					new EmailUtil().sendEmail(dbReq, EMAIL_SUBJECT_WELCOME);
 					isSuccess = true;
 				}
 			}

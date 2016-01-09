@@ -39,14 +39,14 @@ import org.nrjd.bv.server.dto.ServerRequest;
  */
 public class EmailUtil {
 
-	private static Session	session;
+	private Session	session;
 
 	/**
 	 * Gets the HTML basic tags for Header
 	 * 
 	 * @return
 	 */
-	private static String getBodyHeader(String name) {
+	private String getBodyHeader(String name) {
 		StringBuffer buf = new StringBuffer();
 		buf.append("<html><head><meta charset=\"ISO-8859-1\">");
 		buf.append("</head><body><h4>Dear ").append(
@@ -62,7 +62,7 @@ public class EmailUtil {
 	 * 
 	 * @return
 	 */
-	private static String getBodyTrailer() {
+	private String getBodyTrailer() {
 		StringBuffer buf = new StringBuffer();
 		buf.append("<br></br><p><b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b><br>Your Humble Servant,<br></br>Bhakti Vriksha Team</p></body></html>");
 		return buf.toString();
@@ -72,7 +72,7 @@ public class EmailUtil {
 	 * 
 	 * @return
 	 */
-	private static Session getGMailSession() {
+	private Session getGMailSession() {
 
 		if (session == null) {
 
@@ -105,7 +105,7 @@ public class EmailUtil {
 	 * @param mobileVerifCode
 	 * @return
 	 */
-	private static String getPwdResetEmailBody(ServerRequest srvrReq) {
+	private String getPwdResetEmailBody(ServerRequest srvrReq) {
 
 		StringBuffer buf = new StringBuffer();
 		buf.append(getBodyHeader(srvrReq.getName()));
@@ -129,7 +129,7 @@ public class EmailUtil {
 	 * @param mobileVerifCode
 	 * @return
 	 */
-	private static String getVerifEmailBody(ServerRequest srvrReq) {
+	private String getVerifEmailBody(ServerRequest srvrReq) {
 
 		StringBuffer buf = new StringBuffer();
 		buf.append(getBodyHeader(srvrReq.getName()));
@@ -157,7 +157,7 @@ public class EmailUtil {
 	 * @param mobileVerifCode
 	 * @return
 	 */
-	public static String getWelcomeEmailBody(ServerRequest srverReq) {
+	public String getWelcomeEmailBody(ServerRequest srverReq) {
 
 		StringBuffer buf = new StringBuffer();
 		buf.append(getBodyHeader(srverReq.getName()));
@@ -175,7 +175,7 @@ public class EmailUtil {
 	 * 
 	 * @param emailId
 	 */
-	public static void sendEmail(ServerRequest srvrReq, String subject) {
+	public void sendEmail(ServerRequest srvrReq, String subject) {
 
 		Session session = null;
 		try {

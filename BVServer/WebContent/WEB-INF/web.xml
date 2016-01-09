@@ -6,8 +6,13 @@
   </welcome-file-list>
   
   <context-param>
-  <param-name>BVManualLocation</param-name>
-  <param-value>/resources</param-value>
+  	<param-name>BVManualLocation</param-name>
+  	<param-value>C:\Sathya_Personal\Laptop_Stuff\GCOM\JPS_BV\GitRepos_Final\BVServer\resources\books\</param-value>
+  </context-param>
+  
+  <context-param>
+  	<param-name>AppEmailAccount</param-name>
+  	<param-value>bvtestsathya@gmail.com</param-value>
   </context-param>
   
   <servlet>
