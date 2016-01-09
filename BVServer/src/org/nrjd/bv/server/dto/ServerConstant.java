@@ -17,6 +17,8 @@ public final class ServerConstant {
 	public static String	   EMAIL_SUBJECT_PWD_RESET	   = "Bhakthi Vriksha App - Reset Password Requested";
 	public static String	   EMAIL_SUPPORT	           = "iskcon.nrjd.support@gmail.com";
 	public static String	   KEY_CODE	                   = "code";
+	public static String	   JSON_CONTENT_TYPE	       = "application/json";
+	public static String	   ENCODING_FORMAT	           = "UTF-8";
 	public static String	   KEY_STATUS_ID	           = "statusId";
 	public static String	   KEY_MSG	                   = "msg";
 	public static String	   KEY_EMAIL_ID	               = "email";

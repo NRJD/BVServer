@@ -1,7 +1,9 @@
 package org.nrjd.bv.server.servlet;
 
+import static org.nrjd.bv.server.dto.ServerConstant.ENCODING_FORMAT;
+import static org.nrjd.bv.server.dto.ServerConstant.JSON_CONTENT_TYPE;
+
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -52,12 +54,13 @@ public class MobileRequestServlet extends HttpServlet {
 
 		System.out.println(">>> doPost ");
 
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
 		String jsonResponse = new MobileRequestHandler().processRequest(
 		        request, response);
-		out.print(jsonResponse);
-		out.close();
+
+		response.setContentType(JSON_CONTENT_TYPE);
+		response.setCharacterEncoding(ENCODING_FORMAT);
+		response.getWriter().write(jsonResponse);
+		response.getWriter().close();
 		System.out.println("<<< doPost ");
 	}
 

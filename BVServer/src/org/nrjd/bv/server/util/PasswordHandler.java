@@ -35,17 +35,17 @@ public class PasswordHandler {
 
 		String generatedSecuredPasswordHash = null;
 		long start = System.currentTimeMillis();
-		try {
-			generatedSecuredPasswordHash = generateStorngPasswordHash(userProvidedPwd);
+		// try {
+		// generatedSecuredPasswordHash =
+		// generateStorngPasswordHash(userProvidedPwd);
 
-			// generatedSecuredPasswordHash =
-			// getMD5SecurePassword(userProvidedPwd);
-			System.out.println(generatedSecuredPasswordHash);
-		}
-		catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		generatedSecuredPasswordHash = getMD5SecurePassword(userProvidedPwd);
+		System.out.println(generatedSecuredPasswordHash);
+		// }
+		// catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		long end = System.currentTimeMillis();
 		System.out.println("Total Time for PWD  " + (end - start) + " Ms");
 		return generatedSecuredPasswordHash;
@@ -153,6 +153,28 @@ public class PasswordHandler {
 		else {
 			return hex;
 		}
+	}
+
+	/**
+	 * 
+	 * @param originalPassword
+	 * @param storedPassword
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 */
+	public static boolean validateMD5Password(String originalPassword,
+	        String storedPassword) throws NoSuchAlgorithmException,
+	        InvalidKeySpecException {
+
+		boolean isMatched = false;
+
+		String hashedPwd = getMD5SecurePassword(originalPassword);
+		if (hashedPwd != null && storedPassword != null) {
+
+			isMatched = hashedPwd.equals(storedPassword);
+		}
+		return isMatched;
 	}
 
 	/**

@@ -23,15 +23,22 @@ public class CommonUtilTest {
 		ServerRequest srvrReq = new ServerRequest();
 		srvrReq.setEmailId("kinnu_sathya@yahoo.com");
 		srvrReq.setPassword("sathya");
+
+		validateMD5Pwd(srvrReq);
+
+	}
+
+	private static void validateMD5Pwd(ServerRequest srvrReq) throws Exception {
+
 		ServerResponse srvrResponse = new DataAccessServiceImpl()
 		        .verifyLogin(srvrReq);
 
-		String encryptedPwd = PasswordHandler.encryptPassword(srvrReq
-		        .getPassword());
-		boolean isMatched = PasswordHandler.validatePassword(encryptedPwd,
-		        srvrResponse.getDbPassword());
+		boolean validateMD5Password = PasswordHandler.validateMD5Password(
+		        srvrReq.getPassword(), srvrResponse.getDbPassword());
+		System.out.println(validateMD5Password);
+	}
 
-		System.out.println(isMatched);
+	private static void validateStringPwd(String loginPwd, String dbPwd) {
 
 	}
 }
