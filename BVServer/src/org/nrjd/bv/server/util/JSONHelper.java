@@ -4,8 +4,8 @@
 package org.nrjd.bv.server.util;
 
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_CODE;
-import static org.nrjd.bv.server.dto.ServerConstant.KEY_STATUS_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_MSG;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_STATUS_ID;
 
 import java.util.Map;
 import java.util.Set;

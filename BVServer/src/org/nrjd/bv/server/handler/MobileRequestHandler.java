@@ -7,23 +7,22 @@ import static org.nrjd.bv.server.dto.ServerConstant.CMD_ACCT_VERIFY_MOBILE;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_LOGIN;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_LOGOFF;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_REGISTER;
+import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESEND_SUBSCRP_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PROF;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_PWD_RESET;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
-import static org.nrjd.bv.server.dto.ServerConstant.KEY_COUNTRY_CODE;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_FLOW;
-import static org.nrjd.bv.server.dto.ServerConstant.KEY_LANG;
-import static org.nrjd.bv.server.dto.ServerConstant.KEY_NAME;
-import static org.nrjd.bv.server.dto.ServerConstant.KEY_PHONE;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD_RESET_ENABLED;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_TEMP_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -43,6 +42,7 @@ import org.nrjd.bv.server.dto.StatusCode;
 import org.nrjd.bv.server.util.CommonUtility;
 import org.nrjd.bv.server.util.EmailUtil;
 import org.nrjd.bv.server.util.JSONHelper;
+import org.nrjd.bv.server.util.PasswordHandler;
 
 /**
  * @author Sathya
@@ -74,15 +74,39 @@ public class MobileRequestHandler {
 				status = srvrResponse.getCode();
 				if (status != StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS) {
 
-					if (!srvrResponse.isAcctVerified()) {
+					String encryptedPwd = PasswordHandler
+					        .encryptPassword(srvrReq.getPassword());
+					boolean isMatched = false;
+					try {
+						isMatched = PasswordHandler.validatePassword(
+						        encryptedPwd, srvrResponse.getDbPassword());
+						System.out.println(isMatched);
+					}
+					catch (NoSuchAlgorithmException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					catch (InvalidKeySpecException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
-						status = StatusCode.ACCT_NOT_VERIFIED;
+					if (!isMatched) {
+
+						status = StatusCode.INVALID_PWD;
 					}
 					else {
-						HttpSession session = request.getSession();
-						session.setAttribute(KEY_EMAIL_ID, srvrReq.getEmailId());
-						status = StatusCode.LOGIN_SUCCESS;
+						if (!srvrResponse.isAcctVerified()) {
 
+							status = StatusCode.ACCT_NOT_VERIFIED;
+						}
+						else {
+							HttpSession session = request.getSession();
+							session.setAttribute(KEY_EMAIL_ID,
+							        srvrReq.getEmailId());
+							status = StatusCode.LOGIN_SUCCESS;
+
+						}
 					}
 					isPwdResetEnabled = srvrResponse.isResetPwdEnabled();
 				}
@@ -192,6 +216,7 @@ public class MobileRequestHandler {
 	        HttpServletResponse response) {
 
 		System.out.println(">>> processRequest");
+		long start = System.currentTimeMillis();
 		String jsonResponse = null;
 
 		try {
@@ -225,14 +250,20 @@ public class MobileRequestHandler {
 
 					jsonResponse = loginLogOff(json, request);
 				}
+				else if (CMD_RESEND_SUBSCRP_EMAIL.equals(flowCommand)) {
+
+					jsonResponse = resendVerificationEmail(json);
+				}
 			}
 		}
 		catch (BVServerException e) {
+
 			e.printStackTrace();
 			jsonResponse = JSONHelper.getJSonResponse(null,
 			        StatusCode.ERROR_SERVER);
 		}
-
+		long end = System.currentTimeMillis();
+		System.out.println("Total Time " + (end - start) + " Ms");
 		System.out.println("<<< processRequest " + jsonResponse);
 		return jsonResponse;
 	}
@@ -250,31 +281,68 @@ public class MobileRequestHandler {
 		String jsonResponse = null;
 		String email = null;
 		try {
-			String name = (String) json.get(KEY_NAME);
-			String pwd = (String) json.get(KEY_PWD);
-			email = (String) json.get(KEY_EMAIL_ID);
-			String lang = (String) json.get(KEY_LANG);
-			String mobile = (String) json.get(KEY_PHONE);
-			String countryCode = (String) json.get(KEY_COUNTRY_CODE);
-
 			UUID uuid = UUID.randomUUID();
 			String emailVerifCode = uuid.toString().replaceAll("-", "")
 			        .toUpperCase();
 			int mobVerifCode = (100000 + new Random().nextInt(899999));
 
-			ServerRequest srvrReq = new ServerRequest();
-			srvrReq.setEmailId(email);
-			srvrReq.setLanguage(lang);
-			srvrReq.setName(name);
-			srvrReq.setPassword(pwd);
-			srvrReq.setPhoneNumber(mobile);
+			ServerRequest srvrReq = CommonUtility.populateRequestFromJson(json);
 			srvrReq.setEmailVerifCode(emailVerifCode);
 			srvrReq.setMobileVerifCode(String.valueOf(mobVerifCode));
-			srvrReq.setCountryCode(countryCode);
+			email = srvrReq.getEmailId();
+
+			String encryptedPwd = PasswordHandler.encryptPassword(srvrReq
+			        .getPassword());
+			srvrReq.setPassword(encryptedPwd);
 
 			status = new DataAccessServiceImpl().registerNewUser(srvrReq);
 
 			if (status != null && status == StatusCode.USER_ADDED) {
+
+				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_VER_EMAIL);
+			}
+		}
+		catch (BVServerDBException | BVServerException e) {
+			e.printStackTrace();
+			status = StatusCode.ERROR_DB;
+		}
+		Map<String, String> resMap = new TreeMap<String, String>();
+		resMap.put(KEY_EMAIL_ID, email);
+		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
+
+		System.out.println("<<< registerUser " + jsonResponse);
+		return jsonResponse;
+	}
+
+	/**
+	 * This method resends the subscription Verification email if the user has
+	 * not yet verified his subscription. A new email and mobile verification
+	 * code will be generated.
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	private String resendVerificationEmail(JSONObject json) {
+
+		System.out.println(">>> registerUser");
+		StatusCode status = null;
+		String jsonResponse = null;
+		String email = null;
+		try {
+			UUID uuid = UUID.randomUUID();
+			String emailVerifCode = uuid.toString().replaceAll("-", "")
+			        .toUpperCase();
+			int mobVerifCode = (100000 + new Random().nextInt(899999));
+
+			ServerRequest srvrReq = CommonUtility.populateRequestFromJson(json);
+			srvrReq.setEmailVerifCode(emailVerifCode);
+			srvrReq.setMobileVerifCode(String.valueOf(mobVerifCode));
+			email = srvrReq.getEmailId();
+
+			status = new DataAccessServiceImpl()
+			        .updateVerificationCodes(srvrReq);
+
+			if (status != null && status == StatusCode.RESEND_VERIF_SUCCESS) {
 
 				EmailUtil.sendEmail(srvrReq, EMAIL_SUBJECT_VER_EMAIL);
 			}

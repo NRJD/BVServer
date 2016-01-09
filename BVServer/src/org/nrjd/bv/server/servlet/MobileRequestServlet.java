@@ -54,8 +54,8 @@ public class MobileRequestServlet extends HttpServlet {
 
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		String jsonResponse = new MobileRequestHandler().processRequest(request,
-		        response);
+		String jsonResponse = new MobileRequestHandler().processRequest(
+		        request, response);
 		out.print(jsonResponse);
 		out.close();
 		System.out.println("<<< doPost ");

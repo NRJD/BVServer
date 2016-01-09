@@ -10,6 +10,7 @@ import static org.nrjd.bv.server.dto.ServerConstant.DB_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.DB_SCHEMA;
 import static org.nrjd.bv.server.dto.ServerConstant.DB_USER_NAME;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_ACCT_VERIFIED;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_PWD_RESET_ENABLED;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_STATUS_FROM_DB;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_EMAIL_VERIFIED;
@@ -20,6 +21,7 @@ import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_EMAIL;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_VERIFY_MOBILE;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_VERIFY_LOGIN;
 import static org.nrjd.bv.server.dto.ServerConstant.SP_PERSIST_USER;
+import static org.nrjd.bv.server.dto.ServerConstant.SP_UPDATE_VERIFY_CODES;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -68,12 +70,12 @@ public class DataAccessServiceImpl {
 			Class.forName("com.mysql.jdbc.Driver");
 
 			if (connection == null || connection.isClosed()) {
-				
+
 				connection = DriverManager.getConnection(DB_DRIVER + DB_SCHEMA,
 				        DB_USER_NAME, DB_PWD);
 
 				System.out.println("Connection Established ! ");
-				
+
 			}
 		}
 		catch (ClassNotFoundException e) {
@@ -302,6 +304,47 @@ public class DataAccessServiceImpl {
 	}
 
 	/**
+	 * This method updates the new email and mobile Verification code when the
+	 * user requests to resends the subscription Verification email
+	 * 
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	public StatusCode updateVerificationCodes(ServerRequest request)
+	        throws BVServerDBException {
+
+		StatusCode code = null;
+		getConnection();
+		PreparedStatement ps = null;
+
+		try {
+			ps = connection.prepareCall(SP_UPDATE_VERIFY_CODES);
+			ps.setString(1, request.getEmailId());
+			ps.setString(2, request.getEmailVerifCode());
+			ps.setString(3, request.getMobileVerifCode());
+
+			ps.execute();
+
+			ResultSet rs = ps.getResultSet();
+			int dbStatus = 0;
+			while (rs.next()) {
+
+				dbStatus = rs.getInt(OUT_PARAM_STATUS_FROM_DB);
+				System.out.println("OUT_PARAM_STATUS_FROM_DB : " + dbStatus);
+				code = StatusCode.reverseLookup(dbStatus);
+			}
+
+		}
+		catch (SQLException e) {
+			code = handleException(e);
+		}
+		finally {
+			closeConnection(ps);
+		}
+		return code;
+	}
+
+	/**
 	 * This method updates the Name, Mobile, Country Code and Language
 	 * 
 	 * @param request
@@ -318,7 +361,6 @@ public class DataAccessServiceImpl {
 			ps = connection.prepareStatement(QRY_VERIFY_LOGIN);
 
 			ps.setString(1, request.getEmailId());
-			ps.setString(2, request.getPassword());
 			ps.execute();
 
 			ResultSet rs = ps.getResultSet();
@@ -333,6 +375,8 @@ public class DataAccessServiceImpl {
 				booValue = rs.getInt(OUT_PARAM_PWD_RESET_ENABLED);
 				srvrResponse.setResetPwdEnabled(booValue == 0 ? false : true);
 				srvrResponse.setEmailId(request.getEmailId());
+
+				srvrResponse.setDbPassword(rs.getString(OUT_PARAM_PWD));
 			}
 
 		}

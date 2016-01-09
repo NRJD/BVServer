@@ -128,6 +128,9 @@ public class CommonUtility {
 		case 3001:
 			desc = "Email ID already Registered. verify the Email";
 			break;
+		case 3003:
+			desc = "Invalid Password.";
+			break;
 		case 3005:
 			desc = "Account Verified Successfully.";
 			break;
@@ -141,7 +144,7 @@ public class CommonUtility {
 			desc = "Failed to process the Request due to Server Technical Error.Contact System Admin";
 			break;
 		case 3011:
-			desc = "Your Account has been already activated.";
+			desc = "Account activation failed as the Account was already activated.";
 			break;
 		case 3012:
 			desc = "Email Address not provided.";
@@ -205,6 +208,12 @@ public class CommonUtility {
 			break;
 		case 3032:
 			desc = "Logged Off successfully";
+			break;
+		case 3033:
+			desc = "Resend Subscription Code successful.";
+			break;
+		case 3034:
+			desc = "Resend Subscription Code failed due to technical reason.";
 			break;
 		}
 

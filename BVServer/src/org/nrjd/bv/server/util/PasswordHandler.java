@@ -3,7 +3,12 @@
  */
 package org.nrjd.bv.server.util;
 
+import static org.nrjd.bv.server.dto.ServerConstant.PWD_ALGO_MD5;
+import static org.nrjd.bv.server.dto.ServerConstant.PWD_ALGO_PBKD;
+import static org.nrjd.bv.server.dto.ServerConstant.PWD_ALGO_SHA1;
+
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -29,15 +34,20 @@ public class PasswordHandler {
 	        throws BVServerException {
 
 		String generatedSecuredPasswordHash = null;
+		long start = System.currentTimeMillis();
 		try {
 			generatedSecuredPasswordHash = generateStorngPasswordHash(userProvidedPwd);
 
+			// generatedSecuredPasswordHash =
+			// getMD5SecurePassword(userProvidedPwd);
 			System.out.println(generatedSecuredPasswordHash);
 		}
 		catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		long end = System.currentTimeMillis();
+		System.out.println("Total Time for PWD  " + (end - start) + " Ms");
 		return generatedSecuredPasswordHash;
 	}
 
@@ -65,17 +75,52 @@ public class PasswordHandler {
 	 */
 	private static String generateStorngPasswordHash(String password)
 	        throws NoSuchAlgorithmException, InvalidKeySpecException {
+
 		int iterations = 1971;
 		char[] chars = password.toCharArray();
 		byte[] salt = getSalt().getBytes();
 
 		PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
-		SecretKeyFactory skf = SecretKeyFactory
-		        .getInstance("PBKDF2WithHmacSHA1");
+		SecretKeyFactory skf = SecretKeyFactory.getInstance(PWD_ALGO_PBKD);
 		byte[] hash = skf.generateSecret(spec).getEncoded();
 		// return iterations + ":" + toHex(salt) + ":" + toHex(hash);
 
 		return toHex(salt) + ":" + toHex(hash);
+	}
+
+	/**
+	 * 
+	 * @param passwordToHash
+	 * @param salt
+	 * @return
+	 */
+	public static String getMD5SecurePassword(String passwordToHash) {
+		String generatedPassword = null;
+		String salt = null;
+
+		try {
+
+			salt = getSalt();
+			// Create MessageDigest instance for MD5
+			MessageDigest md = MessageDigest.getInstance(PWD_ALGO_MD5);
+			// Add password bytes to digest
+			md.update(salt.getBytes());
+			// Get the hash's bytes
+			byte[] bytes = md.digest(passwordToHash.getBytes());
+			// This bytes[] has bytes in decimal format;
+			// Convert it to hexadecimal format
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < bytes.length; i++) {
+				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16)
+				        .substring(1));
+			}
+			// Get complete hashed password in hex format
+			generatedPassword = sb.toString();
+		}
+		catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return generatedPassword;
 	}
 
 	/**
@@ -86,7 +131,7 @@ public class PasswordHandler {
 	 */
 	private static String getSalt() throws NoSuchAlgorithmException {
 
-		SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+		SecureRandom sr = SecureRandom.getInstance(PWD_ALGO_SHA1);
 		byte[] salt = new byte[16];
 		sr.nextBytes(salt);
 		return salt.toString();
@@ -123,9 +168,9 @@ public class PasswordHandler {
 	        InvalidKeySpecException {
 
 		String[] parts = storedPassword.split(":");
-		int iterations = Integer.parseInt(parts[0]);
-		byte[] salt = fromHex(parts[1]);
-		byte[] hash = fromHex(parts[2]);
+		int iterations = 1971;
+		byte[] salt = fromHex(parts[0]);
+		byte[] hash = fromHex(parts[1]);
 
 		PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), salt,
 		        iterations, hash.length * 8);

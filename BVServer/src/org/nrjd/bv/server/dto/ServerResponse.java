@@ -16,12 +16,20 @@ public class ServerResponse implements Serializable {
 	private boolean	          isResetPwdEnabled;
 	private String	          emailId;
 	private StatusCode	      code;
+	private String	          dbPassword;
 
 	/**
 	 * @return the code
 	 */
 	public StatusCode getCode() {
 		return code;
+	}
+
+	/**
+	 * @return the dbPassword
+	 */
+	public String getDbPassword() {
+		return dbPassword;
 	}
 
 	/**
@@ -59,6 +67,14 @@ public class ServerResponse implements Serializable {
 	 */
 	public void setCode(StatusCode code) {
 		this.code = code;
+	}
+
+	/**
+	 * @param dbPassword
+	 *            the dbPassword to set
+	 */
+	public void setDbPassword(String dbPassword) {
+		this.dbPassword = dbPassword;
 	}
 
 	/**
