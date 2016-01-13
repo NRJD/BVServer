@@ -23,6 +23,7 @@ import org.nrjd.bv.server.dto.BVServerException;
  * 
  */
 public class PasswordHandler {
+	private static final int PASSWORD_HASH_KEY_LENGTH = 64 * 8; 
 
 	/**
 	 * 
@@ -80,7 +81,7 @@ public class PasswordHandler {
 		char[] chars = password.toCharArray();
 		byte[] salt = getSalt().getBytes();
 
-		PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, 64 * 8);
+		PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, PASSWORD_HASH_KEY_LENGTH);
 		SecretKeyFactory skf = SecretKeyFactory.getInstance(PWD_ALGO_PBKD);
 		byte[] hash = skf.generateSecret(spec).getEncoded();
 		return iterations + ":" + toHex(salt) + ":" + toHex(hash);
@@ -191,13 +192,13 @@ public class PasswordHandler {
 
 		String[] parts = storedPassword.split(":");
 		int iterations = Integer.valueOf(parts[0]);
-		byte[] salt = fromHex(parts[0]);
-		byte[] hash = fromHex(parts[1]);
+		byte[] salt = fromHex(parts[1]);
+		byte[] hash = fromHex(parts[2]);
 
 		PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), salt,
-		        iterations, hash.length * 8);
+		        iterations, PASSWORD_HASH_KEY_LENGTH);
 		SecretKeyFactory skf = SecretKeyFactory
-		        .getInstance("PBKDF2WithHmacSHA1");
+		        .getInstance(PWD_ALGO_PBKD);
 		byte[] testHash = skf.generateSecret(spec).getEncoded();
 
 		int diff = hash.length ^ testHash.length;

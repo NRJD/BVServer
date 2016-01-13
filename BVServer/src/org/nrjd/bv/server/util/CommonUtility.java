@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.nrjd.bv.server.dto.BVServerException;
+import org.nrjd.bv.server.dto.ServerConstant;
 import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.StatusCode;
 
@@ -244,9 +245,11 @@ public class CommonUtility {
 	private static String getRequestData(InputStream inputData)
 	        throws BVServerException {
 
-		InputStreamReader isr = new InputStreamReader(inputData);
-		BufferedReader br = new BufferedReader(isr);
+		InputStreamReader isr = null;
+		BufferedReader br = null;
 		try {
+			isr = new InputStreamReader(inputData, ServerConstant.ENCODING_FORMAT);
+			br = new BufferedReader(isr);
 			StringBuffer xmlBuffer = new StringBuffer();
 			String line = null;
 			while ((line = br.readLine()) != null) {
@@ -262,12 +265,16 @@ public class CommonUtility {
 		}
 		finally {
 			try {
-				br.close();
+				if(br != null) {
+					br.close();
+				}
 			}
 			catch (Exception e) { /* Ignore Exception */
 			}
 			try {
-				isr.close();
+				if(isr != null) {
+					isr.close();
+				}
 			}
 			catch (Exception e) { /* Ignore Exception */
 			}

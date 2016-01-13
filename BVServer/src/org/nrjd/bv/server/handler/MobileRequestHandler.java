@@ -71,12 +71,10 @@ public class MobileRequestHandler {
 				status = srvrResponse.getCode();
 				if (status != StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS) {
 
-					String encryptedPwd = PasswordHandler
-					        .encryptPassword(srvrReq.getPassword());
 					boolean isMatched = false;
 					try {
 						isMatched = PasswordHandler.validatePassword(
-						        encryptedPwd, srvrResponse.getDbPassword());
+								srvrReq.getPassword(), srvrResponse.getDbPassword());
 						System.out.println(isMatched);
 					}
 					catch (NoSuchAlgorithmException e) {
