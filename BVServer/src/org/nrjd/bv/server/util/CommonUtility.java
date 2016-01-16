@@ -216,6 +216,9 @@ public class CommonUtility {
 		case 3034:
 			desc = "Resend Subscription Code failed due to technical reason.";
 			break;
+		case 3035:
+			desc = "Email is not registered.";
+			break;
 		}
 
 		return desc;

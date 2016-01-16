@@ -13,6 +13,13 @@ import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_ACCT_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_PWD_RESET_ENABLED;
 import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_STATUS_FROM_DB;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_USER_LOGIN_ID;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_EMAIL;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_NAME;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_MOBILE_NUMBER;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_COUNTRY_CODE;
+import static org.nrjd.bv.server.dto.ServerConstant.OUT_PARAM_LANGUAGE;
+import static org.nrjd.bv.server.dto.ServerConstant.QRY_GET_USER;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_EMAIL_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_IS_ACCT_MOBILE_VERIFIED;
 import static org.nrjd.bv.server.dto.ServerConstant.QRY_UPDATE_PROFILE;
@@ -32,6 +39,7 @@ import java.sql.SQLException;
 import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.ServerResponse;
 import org.nrjd.bv.server.dto.StatusCode;
+import org.nrjd.bv.server.dto.UserData;
 
 /**
  * @author Sathya
@@ -153,7 +161,7 @@ public class DataAccessServiceImpl {
 
 		return emailVerified;
 	}
-
+	
 	/**
 	 * This method calls the stored procedure to persist the user. The stored
 	 * procedure checks if the Email address already exist in the system, if yes
@@ -390,11 +398,11 @@ public class DataAccessServiceImpl {
 		}
 		finally {
 
-			// that means the emailId/Password did not match
+			// That means the emailId did not match
 			if (srvrResponse == null) {
 				srvrResponse = new ServerResponse();
 				srvrResponse
-				        .setCode(StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS);
+				        .setCode(StatusCode.EMAIL_NOT_REGISTERED);
 			}
 			closeConnection(ps);
 		}
@@ -450,5 +458,53 @@ public class DataAccessServiceImpl {
 			closeConnection(ps);
 		}
 		return code;
+	}
+
+	/**
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	public boolean isEmailExists(String emailaddress) throws BVServerDBException {
+		return (getUserByEmail(emailaddress) != null);
+	}
+	
+	/**
+	 * @param request
+	 * @throws BVServerDBException
+	 */
+	public UserData getUserByEmail(String emailaddress)
+	        throws BVServerDBException {
+		getConnection();
+		PreparedStatement ps = null;
+		try {
+			ps = connection.prepareStatement(QRY_GET_USER);
+			ps.setString(1, emailaddress);
+			ResultSet rs = ps.executeQuery();
+			if (rs != null) {
+				while (rs.next()) {
+					int isAccountVerified = rs.getInt(OUT_PARAM_ACCT_VERIFIED);
+					int isPwdResetEnabled = rs.getInt(OUT_PARAM_PWD_RESET_ENABLED);
+					UserData userData = new UserData(rs.getInt(OUT_PARAM_USER_LOGIN_ID));
+					userData.setName(OUT_PARAM_NAME);
+					userData.setEmailId(OUT_PARAM_EMAIL);
+					userData.setPassword(OUT_PARAM_PWD);
+					userData.setPassword(OUT_PARAM_MOBILE_NUMBER);
+					userData.setCountryCode(rs.getInt(OUT_PARAM_COUNTRY_CODE));
+					userData.setLanguage(OUT_PARAM_LANGUAGE);
+					userData.setIsAccountVerified(isAccountVerified == 0 ? false : true);
+					userData.setIsPwdResetEnabled(isPwdResetEnabled == 0 ? false : true);
+					return userData;
+				}
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			throw new BVServerDBException(e.getMessage());
+		}
+		finally {
+			closeConnection(ps);
+		}
+
+		return null;
 	}
 }

@@ -37,6 +37,11 @@ public final class ServerConstant {
 	public static String	   OUT_PARAM_PWD	           = "PASSWORD";
 	public static String	   OUT_PARAM_ACCT_VERIFIED	   = "ACCT_VERIFIED";
 	public static String	   OUT_PARAM_PWD_RESET_ENABLED	= "PWD_RESET_ENABLED";
+	public static String	   OUT_PARAM_USER_LOGIN_ID	   = "USER_LOGIN_ID";
+	public static String	   OUT_PARAM_NAME              = "NAME";
+	public static String	   OUT_PARAM_MOBILE_NUMBER	   = "MOBILE_NUMBER";
+	public static String	   OUT_PARAM_COUNTRY_CODE	   = "COUNTRY_CODE";
+	public static String	   OUT_PARAM_LANGUAGE	       = "LANGUAGE";
 	public static String	   CMD_REGISTER	               = "register";
 	public static String	   CMD_LOGIN	               = "login";
 	public static String	   CMD_LOGOFF	               = "logoff";
@@ -66,6 +71,7 @@ public final class ServerConstant {
 	public static String	   QRY_UPDATE_PWD	           = "UPDATE user_login SET PASSWORD = ?, PWD_RESET_ENABLED = ? WHERE EMAIL_ID = ?";
 	public static String	   QRY_IS_ACCT_EMAIL_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
 	public static String	   QRY_IS_ACCT_MOBILE_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE MOBILE_VERIF_CODE=? AND EMAIL_ID=?";
+	public static String	   QRY_GET_USER	               = "SELECT * FROM user_login WHERE EMAIL_ID = ?";
 	public static int	       VAL_EMAIL_LEN	           = 50;
 	public static int	       VAL_NAME_LEN	               = 50;
 	public static int	       VAL_PWD_LEN	               = 15;

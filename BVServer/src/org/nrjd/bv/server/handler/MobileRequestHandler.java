@@ -38,6 +38,7 @@ import org.nrjd.bv.server.dto.BVServerException;
 import org.nrjd.bv.server.dto.ServerRequest;
 import org.nrjd.bv.server.dto.ServerResponse;
 import org.nrjd.bv.server.dto.StatusCode;
+import org.nrjd.bv.server.dto.UserData;
 import org.nrjd.bv.server.util.CommonUtility;
 import org.nrjd.bv.server.util.EmailUtil;
 import org.nrjd.bv.server.util.JSONHelper;
@@ -65,45 +66,12 @@ public class MobileRequestHandler {
 
 			if (CMD_LOGIN.equals(srvrReq.getCommandFlow())) {
 
-				ServerResponse srvrResponse = new DataAccessServiceImpl()
-				        .verifyLogin(srvrReq);
-
+				ServerResponse srvrResponse = verifyLoginCredentials(srvrReq, false);
 				status = srvrResponse.getCode();
-				if (status != StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS) {
-
-					boolean isMatched = false;
-					try {
-						isMatched = PasswordHandler.validatePassword(
-								srvrReq.getPassword(), srvrResponse.getDbPassword());
-						System.out.println(isMatched);
-					}
-					catch (NoSuchAlgorithmException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					catch (InvalidKeySpecException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					if (!isMatched) {
-
-						status = StatusCode.INVALID_PWD;
-					}
-					else {
-						if (!srvrResponse.isAcctVerified()) {
-
-							status = StatusCode.ACCT_NOT_VERIFIED;
-						}
-						else {
-							HttpSession session = request.getSession();
-							session.setAttribute(KEY_EMAIL_ID,
-							        srvrReq.getEmailId());
-							status = StatusCode.LOGIN_SUCCESS;
-
-						}
-					}
-					isPwdResetEnabled = srvrResponse.isResetPwdEnabled();
+				isPwdResetEnabled = srvrResponse.isResetPwdEnabled();
+				if(status == StatusCode.LOGIN_SUCCESS) {
+					HttpSession session = request.getSession();
+					session.setAttribute(KEY_EMAIL_ID, srvrReq.getEmailId());
 				}
 			}
 			else {
@@ -130,6 +98,56 @@ public class MobileRequestHandler {
 		System.out.println("<<< loginLogOff " + jsonResponse);
 		return jsonResponse;
 	}
+	
+	/**
+	 * This method verifies user login credentials.
+	 * 
+	 * @param request
+	 * @return ServerResponse
+	 * @throws BVServerDBException
+	 */
+	private ServerResponse verifyLoginCredentials(ServerRequest srvrReq, boolean verifyTempPassword) throws BVServerDBException {
+		
+			System.out.println(">>> processLogin");
+			ServerResponse srvrResponse = new DataAccessServiceImpl().verifyLogin(srvrReq);
+			
+			// If no error code, then proceed with verifying the user password.
+			if (srvrResponse.getCode() == null) {
+				boolean isMatched = false;
+				try {
+					String inputPassword = (verifyTempPassword? srvrReq.getTempPwd() : srvrReq.getPassword());
+					isMatched = PasswordHandler.validatePassword(
+							inputPassword, srvrResponse.getDbPassword());
+					System.out.println(isMatched);
+				}
+				catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch (InvalidKeySpecException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				if (!isMatched) {
+					srvrResponse.setCode(StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS);
+				}
+				else {
+					if (!srvrResponse.isAcctVerified()) {
+						srvrResponse.setCode(StatusCode.ACCT_NOT_VERIFIED);
+					}
+					else {
+						srvrResponse.setCode(StatusCode.LOGIN_SUCCESS);
+					}
+				}
+			} 
+			
+			// If for some reason, if status code is still not set, then set it to default login failed code.
+			if (srvrResponse.getCode() == null) {
+				srvrResponse.setCode(StatusCode.LOGIN_FAILED_INVALID_CREDENTIALS);
+			}
+			return srvrResponse;
+	}
 
 	/**
 	 * This method reset and updates the password requests.
@@ -144,37 +162,66 @@ public class MobileRequestHandler {
 		String jsonResponse = null;
 		String email = null;
 		String tempPassword = null;
+		String encryptedTempPassword = null;
 		String password = null;
+		String encryptedPassword = null;
 		boolean pwdResetEnabled = false;
 		try {
 			String commandFlow = srvrReq.getCommandFlow();
-
+			email = srvrReq.getEmailId();
 			if (CMD_RESET_PWD.equals(commandFlow)) {
-				tempPassword = CommonUtility.generateTempPassword();
+				tempPassword = CommonUtility.generateTempPassword(); // This is new temporary password to be updated.
+				encryptedTempPassword = PasswordHandler.encryptPassword(tempPassword); // Encrypt the new temporary password to be updated.
 			}
 			else {
-				tempPassword = srvrReq.getTempPwd();
-				password = srvrReq.getPassword();// this is new password
+				ServerResponse srvrResponse = verifyLoginCredentials(srvrReq, true);
+				status = srvrResponse.getCode();
+				pwdResetEnabled = srvrResponse.isResetPwdEnabled();
+				if(status == StatusCode.LOGIN_SUCCESS) {
+					tempPassword = srvrReq.getTempPwd(); // This is existing password to be matched.
+					password = srvrReq.getPassword(); // This is new password to be updated.
+					encryptedTempPassword = srvrResponse.getDbPassword(); // Assign the existing encrypted password value.
+					encryptedPassword = PasswordHandler.encryptPassword(password); // Encrypt the new password to be updated.
+				} else {
+					Map<String, String> resMap = new TreeMap<String, String>();
+					resMap.put(KEY_EMAIL_ID, email);
+					resMap.put(KEY_PWD_RESET_ENABLED, Boolean.toString(pwdResetEnabled));
+					jsonResponse = JSONHelper.getJSonResponse(resMap, status);
+					System.out.println("<<< processPasswordUpdate " + jsonResponse);
+					return jsonResponse;
+				}
 			}
-			srvrReq.setEmailId(srvrReq.getEmailId());
+			srvrReq.setEmailId(email);
 			srvrReq.setCommandFlow(commandFlow);
-			srvrReq.setTempPwd(tempPassword);
-			srvrReq.setPassword(password);
-
-			status = new DataAccessServiceImpl().resetPassword(srvrReq);
-
+			// Use encrypted passwords for DB operations.
+			srvrReq.setTempPwd(encryptedTempPassword);
+			srvrReq.setPassword(encryptedPassword);
+			// Update in DB
+			try{
+				status = new DataAccessServiceImpl().resetPassword(srvrReq);
+			} finally {
+				// Use normal passwords after DB operation, so that we can use the
+				// normal passwords in email notifications etc.
+				srvrReq.setTempPwd(tempPassword);
+				srvrReq.setPassword(password);
+			}
+			
 			if (status == StatusCode.PWD_RESET_ENABLED) {
-
 				new EmailUtil().sendEmail(srvrReq, EMAIL_SUBJECT_PWD_RESET);
 				pwdResetEnabled = true;
 			}
 			else if (status == StatusCode.PWD_UPDATED_SUCCESS) {
-
 				pwdResetEnabled = false;
 			}
-			else if (status == StatusCode.PWD_UPDATE_FAILED) {
-
-				pwdResetEnabled = true;
+			else if ((status == StatusCode.PWD_RESET_FAILED) || (status == StatusCode.PWD_UPDATE_FAILED)) {
+				UserData userData = new DataAccessServiceImpl().getUserByEmail(email);
+				if(userData == null) {
+					status = StatusCode.EMAIL_NOT_REGISTERED;
+					// If user doesn't exists, then pwdResetEnabled flag doesn't make sense, so set it to not enabled.
+					pwdResetEnabled = false; 
+				} else {
+					pwdResetEnabled = userData.isPwdResetEnabled();
+				}
 			}
 		}
 		catch (BVServerDBException e) {
@@ -408,6 +455,10 @@ public class MobileRequestHandler {
 			if (status == StatusCode.ACCT_VERIFIED) {
 
 				new EmailUtil().sendEmail(srvrRequest, EMAIL_SUBJECT_WELCOME);
+			} else {
+				if(!(new DataAccessServiceImpl().isEmailExists(srvrRequest.getEmailId()))) {
+					status = StatusCode.EMAIL_NOT_REGISTERED;
+				}
 			}
 		}
 		catch (BVServerDBException e) {
