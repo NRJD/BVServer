@@ -4,26 +4,24 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Bhakthi Vriksha Account Activation</title>
+<title>Bhakthi Vriksha app - Account Activation</title>
 </head>
 <body>
 
 <form action="successEmail" method="get">
-
-	<h4>Hare Krishna Devotee,</h4>
-	<h4 id="statText"><font color="red">Your Account was already Activated</font></h4>
-	All Glories To Srila Prabhupada.
-	<br/>All Glories To Sri Guru and Gauranga.
-	<br/>
-	<br/>
-	<p>Your Account has not been activated because the Email address or verification code did not match with our records.
+	<h4>Hare Krishna!</h4>
+	Welcome to Bhakthi Vriksha app.
 	<br>
-	Please follow the link provided in your subscription activation email to activate your account.
-	</p>
-	</br>
-	 
-	<b>Please Chant Hare Krsna Maha Mantra and Be Happy,</b>
-	<br>Bhakti Vriksha Team
+	<br/>All Glories To Srila Prabhupada!
+	<br/>All Glories To Sri Guru and Gauranga!
+	<br/>
+	<h3><font color="green">Your Account was already got activated!</font></h3>
+	<font color=green>You can login into the Bhakti Vriksha app.</font>
+	<br/>
+	<br/>
+	<br/>Please Chant <b>Hare Krishna Maha Mantra</b> and Be Happy!
+	<br/>
+	<br/>Bhakti Vriksha Team
 	</form>
 </body>
 </html>

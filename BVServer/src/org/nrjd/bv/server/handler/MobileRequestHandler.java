@@ -12,7 +12,7 @@ import static org.nrjd.bv.server.dto.ServerConstant.CMD_RESET_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PROF;
 import static org.nrjd.bv.server.dto.ServerConstant.CMD_UPDATE_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_PWD_RESET;
-import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_VER_EMAIL;
+import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_ACC_ACTIVATION;
 import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_FLOW;
@@ -339,7 +339,7 @@ public class MobileRequestHandler {
 
 			if (status != null && status == StatusCode.USER_ADDED) {
 
-				new EmailUtil().sendEmail(srvrReq, EMAIL_SUBJECT_VER_EMAIL);
+				new EmailUtil().sendEmail(srvrReq, EMAIL_SUBJECT_ACC_ACTIVATION);
 			}
 		}
 		catch (BVServerDBException | BVServerException e) {
@@ -383,7 +383,7 @@ public class MobileRequestHandler {
 
 			if (status != null && status == StatusCode.RESEND_VERIF_SUCCESS) {
 
-				new EmailUtil().sendEmail(srvrReq, EMAIL_SUBJECT_VER_EMAIL);
+				new EmailUtil().sendEmail(srvrReq, EMAIL_SUBJECT_ACC_ACTIVATION);
 			}
 		}
 		catch (BVServerDBException e) {
