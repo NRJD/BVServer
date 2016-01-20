@@ -63,6 +63,10 @@ public class EmailUtil {
 		return buf.toString();
 	}
 
+	private static String getEmailLink() {
+		// <a href="mailto:email">email</a>
+		return "<a href=\"mailto:" + ServerConstant.EMAIL_SUPPORT + "\">" + ServerConstant.EMAIL_SUPPORT + "</a>";
+	}
 	/**
 	 * Gets the HTML basic tags for Trailer
 	 * 
@@ -70,7 +74,7 @@ public class EmailUtil {
 	 */
 	private String getBodyTrailer() {
 		StringBuffer buf = new StringBuffer();
-		buf.append("For any technical support, questions or feedback, please write to " + ServerConstant.EMAIL_SUPPORT);		
+		buf.append("For any technical support, questions or feedback, please send email to: ").append(getEmailLink());		
 		buf.append(INSERT_ONE_BLANK_LINE).append("Please Chant <b>Hare Krishna Maha Mantra</b> and Be Happy!");
 		buf.append(INSERT_ONE_BLANK_LINE).append("Your Humble Servant,");
 		buf.append(NEW_LINE).append("Bhakti Vriksha Team");
