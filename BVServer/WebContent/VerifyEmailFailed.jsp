@@ -16,9 +16,14 @@
 	<br/>All Glories To Sri Guru and Gauranga!
 	<br/>
 	<h3><font color="red">Your Account is not activated!</font></h3>
-	<font color=brown>Your account has not been activated because either the email address or verification code did not match with our records..</font>
+	<font color=brown>Your account has not been activated because either the email address or verification code did not match with our records.</font>
 	<br/>
-	<br/>Please follow the link provided in your account activation email to activate your account.
+	<br/>
+	Please check your latest account activation email and follow the link provided there to activate your account.
+	<br/>
+	<b>OR</b>
+	<br/>
+	Request to resend the account activation details from the Bhakthi Vriksha app.
 	<br/>
 	<br/>
 	<br/>Please Chant <b>Hare Krishna Maha Mantra</b> and Be Happy!

@@ -385,6 +385,9 @@ public class MobileRequestHandler {
 
 				new EmailUtil().sendEmail(srvrReq, EMAIL_SUBJECT_ACC_ACTIVATION);
 			}
+			else if (status == null) {
+				status = StatusCode.RESEND_VERIF_FAILED;
+			}
 		}
 		catch (BVServerDBException e) {
 			e.printStackTrace();

@@ -11,11 +11,15 @@ declare	emailInDB varchar(50);
 declare	acctVerified int(1);
 declare statusCode int(4);
 
-set @acctVerified = 0;
+set @statusCode = -1;
+set @acctVerified = -1;
 
 	SELECT ACCT_VERIFIED into @acctVerified FROM bv.user_login where email_id  = emailId;
-    
-    IF @acctVerified = 0 THEN
+
+    IF @acctVerified = -1 THEN
+		SET @statusCode = 3035 ; -- Email not registered.
+        
+    ELSE IF @acctVerified = 0 THEN
     
 		BEGIN
 			
@@ -36,9 +40,11 @@ set @acctVerified = 0;
 		SET @statusCode = 3011 ; -- Account Already Verified
 	
     END IF;
+    END IF;
     
     SELECT @statusCode as 'STATUS_FROM_DB';
 
 END$$
 DELIMITER ;
+
 

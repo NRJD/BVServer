@@ -12,9 +12,9 @@ public final class ServerConstant {
 	public static final String	PWD_ALGO_MD5	           = "MD5";
 	public static final String	PWD_ALGO_PBKD	           = "PBKDF2WithHmacSHA1";
 	public static final String	PWD_ALGO_SHA1	           = "SHA1PRNG";
-	public static String	   EMAIL_SUBJECT_ACC_ACTIVATION= "Bhakthi Vriksha app - Please activate your account";
+	public static String	   EMAIL_SUBJECT_ACC_ACTIVATION= "Activate your Bhakthi Vriksha app account";
 	public static String	   EMAIL_SUBJECT_WELCOME	   = "Welcome to Bhakti Vriksha app";
-	public static String	   EMAIL_SUBJECT_PWD_RESET	   = "Bhakthi Vriksha app - Reset password requested";
+	public static String	   EMAIL_SUBJECT_PWD_RESET	   = "Reset password for Bhakthi Vriksha app account";
 	public static String	   EMAIL_SUPPORT	           = "iskcon.nrjd.support@gmail.com";
 	public static String	   KEY_CODE	                   = "code";
 	public static String	   JSON_CONTENT_TYPE	       = "application/json";
