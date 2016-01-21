@@ -15,7 +15,7 @@ public final class ServerConstant {
 	public static String	   EMAIL_SUBJECT_ACC_ACTIVATION= "Activate your Bhakthi Vriksha app account";
 	public static String	   EMAIL_SUBJECT_WELCOME	   = "Welcome to Bhakti Vriksha app";
 	public static String	   EMAIL_SUBJECT_PWD_RESET	   = "Reset password for Bhakthi Vriksha app account";
-	public static String	   EMAIL_SUPPORT	           = "iskcon.nrjd.support@gmail.com";
+	public static String	   EMAIL_SUPPORT	           = "iskcon.nrjd.help@gmail.com";
 	public static String	   KEY_CODE	                   = "code";
 	public static String	   JSON_CONTENT_TYPE	       = "application/json";
 	public static String	   ENCODING_FORMAT	           = "UTF-8";
@@ -53,7 +53,7 @@ public final class ServerConstant {
 	public static String	   CMD_DOWNLOAD	               = "download";
 	public static String	   EMAIL_GMAIL_HOST	           = "smtp.gmail.com";
 	public static String	   EMAIL_GMAIL_PORT	           = "465";
-	public static String	   EMAIL_ACCT_ID	           = "bvtestsathya@gmail.com";
+	public static String	   EMAIL_ACCT_ID	           = "iskcon.nrjd.noreply@gmail.com";
 	public static String	   DB_DRIVER	               = "jdbc:mysql://localhost:3306/";
 	public static String	   DB_SCHEMA	               = "bv";
 	public static String	   DB_USER_NAME	               = "root";

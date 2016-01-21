@@ -67,6 +67,7 @@ public class EmailUtil {
 		// <a href="mailto:email">email</a>
 		return "<a href=\"mailto:" + ServerConstant.EMAIL_SUPPORT + "\">" + ServerConstant.EMAIL_SUPPORT + "</a>";
 	}
+	
 	/**
 	 * Gets the HTML basic tags for Trailer
 	 * 
@@ -130,8 +131,7 @@ public class EmailUtil {
 		buf.append("<b>").append(srvrReq.getTempPwd()).append("</b>");
 		buf.append(" from your Bhakthi Vriksha app.");
 		buf.append(INSERT_ONE_BLANK_LINE);
-		buf.append("In case if you did not request a reset password, please send your concern to: <b>")
-		        .append(EMAIL_SUPPORT).append("</b>");
+		buf.append("In case if you did not request a reset password, please report this to: ").append(getEmailLink());
 		buf.append(INSERT_TWO_BLANK_LINES);
 		buf.append(getBodyTrailer());
 		return buf.toString();

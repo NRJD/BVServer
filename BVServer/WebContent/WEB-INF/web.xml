@@ -12,7 +12,7 @@
   
   <context-param>
   	<param-name>AppEmailAccount</param-name>
-  	<param-value>bvtestsathya@gmail.com</param-value>
+  	<param-value>iskcon.nrjd.noreply@gmail.com</param-value>
   </context-param>
   
   <servlet>
@@ -43,7 +43,7 @@
   </servlet-mapping>
   
   <resource-ref>
-    <description>BV App</description>
+    <description>Bhakthi Vriksha app</description>
     <res-ref-name>mail/Session</res-ref-name>
     <res-type>javax.mail.Session</res-type>
     <res-auth>Container</res-auth>
