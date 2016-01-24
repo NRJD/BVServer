@@ -17,11 +17,13 @@ import static org.nrjd.bv.server.dto.ServerConstant.EMAIL_SUBJECT_WELCOME;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_EMAIL_ID;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_FLOW;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD_RESET_ENABLED;
+import static org.nrjd.bv.server.dto.ServerConstant.KEY_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_TEMP_PWD;
 import static org.nrjd.bv.server.dto.ServerConstant.KEY_VERIF_CODE;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -95,7 +97,7 @@ public class MobileRequestHandler {
 		resMap.put(KEY_PWD_RESET_ENABLED, String.valueOf(isPwdResetEnabled));
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
-		System.out.println("<<< loginLogOff " + jsonResponse);
+		logResponseData("<<< loginLogOff ", status, resMap);
 		return jsonResponse;
 	}
 	
@@ -118,7 +120,6 @@ public class MobileRequestHandler {
 					String inputPassword = (verifyTempPassword? srvrReq.getTempPwd() : srvrReq.getPassword());
 					isMatched = PasswordHandler.validatePassword(
 							inputPassword, srvrResponse.getDbPassword());
-					System.out.println(isMatched);
 				}
 				catch (NoSuchAlgorithmException e) {
 					// TODO Auto-generated catch block
@@ -187,7 +188,7 @@ public class MobileRequestHandler {
 					resMap.put(KEY_EMAIL_ID, email);
 					resMap.put(KEY_PWD_RESET_ENABLED, Boolean.toString(pwdResetEnabled));
 					jsonResponse = JSONHelper.getJSonResponse(resMap, status);
-					System.out.println("<<< processPasswordUpdate " + jsonResponse);
+					logResponseData("<<< processPasswordUpdate ", status, resMap);
 					return jsonResponse;
 				}
 			}
@@ -238,7 +239,7 @@ public class MobileRequestHandler {
 		resMap.put(KEY_PWD_RESET_ENABLED, Boolean.toString(pwdResetEnabled));
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
-		System.out.println("<<< processPasswordUpdate " + jsonResponse);
+		logResponseData("<<< processPasswordUpdate ", status, resMap);
 		return jsonResponse;
 	}
 
@@ -264,7 +265,7 @@ public class MobileRequestHandler {
 			ServerRequest srvrReq = CommonUtility.populateRequestFromJson(json);
 
 			String flowCommand = (String) json.get(KEY_FLOW);
-			System.out.println("Read Data : " + json);
+			logRequestData("Request JSON Data: ", json);
 			if (flowCommand != null && flowCommand.length() > 0) {
 
 				if (CMD_REGISTER.equals(flowCommand)) {
@@ -305,7 +306,6 @@ public class MobileRequestHandler {
 		}
 		long end = System.currentTimeMillis();
 		System.out.println("Total Time " + (end - start) + " Ms");
-		System.out.println("<<< processRequest " + jsonResponse);
 		return jsonResponse;
 	}
 
@@ -350,7 +350,7 @@ public class MobileRequestHandler {
 		resMap.put(KEY_EMAIL_ID, email);
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
-		System.out.println("<<< registerUser " + jsonResponse);
+		logResponseData("<<< registerUser ", status, resMap);
 		return jsonResponse;
 	}
 
@@ -397,7 +397,7 @@ public class MobileRequestHandler {
 		resMap.put(KEY_EMAIL_ID, email);
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
-		System.out.println("<<< registerUser " + jsonResponse);
+		logResponseData("<<< registerUser ", status, resMap);
 		return jsonResponse;
 	}
 
@@ -428,7 +428,7 @@ public class MobileRequestHandler {
 		resMap.put(KEY_EMAIL_ID, srvrReq.getEmailId());
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
-		System.out.println("<<< updateProfile " + jsonResponse);
+		logResponseData("<<< updateProfile ", status, resMap);
 		return jsonResponse;
 	}
 
@@ -473,8 +473,36 @@ public class MobileRequestHandler {
 		resMap.put(KEY_VERIF_CODE, mobVerifCode);
 		jsonResponse = JSONHelper.getJSonResponse(resMap, status);
 
-		System.out.println("<<< verifyAcctFromMobile " + jsonResponse);
+		logResponseData("<<< verifyAcctFromMobile ", status, resMap);
 		return jsonResponse;
 	}
 
+	private static void logRequestData(String message, JSONObject json) {
+		if(json != null) {
+			try {
+				// Don't print passwords into logs.
+				JSONObject clonedData = (JSONObject) json.clone();
+				clonedData.remove(KEY_PWD);
+				clonedData.remove(KEY_TEMP_PWD);
+				System.out.println(message + clonedData);
+			} catch(Exception e) {
+				// Ignore this exception.
+			}
+		}
+	}
+
+	private static void logResponseData(String message, StatusCode status, Map<String, String> resMap) {
+		if(resMap != null) {
+			try {
+				// Don't print passwords into logs.
+				Map<String, String> clonedData = new HashMap<String, String>();
+				clonedData.putAll(resMap);
+				clonedData.remove(KEY_PWD);
+				clonedData.remove(KEY_TEMP_PWD);
+				System.out.println(message + "status: " + status + ": " + clonedData);
+			} catch(Exception e) {
+				// Ignore this exception.
+			}
+		}
+	}
 }

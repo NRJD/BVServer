@@ -259,7 +259,6 @@ public class CommonUtility {
 				xmlBuffer.append(line);
 			}
 			String xmlData = xmlBuffer.toString();
-			System.out.println("XML Request Data: " + xmlData);
 			return xmlData;
 		}
 		catch (IOException e) {
