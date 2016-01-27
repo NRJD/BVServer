@@ -36,7 +36,7 @@ public final class ServerConstant {
 	public static String	   OUT_PARAM_EMAIL	           = "EMAIL_ID";
 	public static String	   OUT_PARAM_PWD	           = "PASSWORD";
 	public static String	   OUT_PARAM_ACCT_VERIFIED	   = "ACCT_VERIFIED";
-	public static String	   OUT_PARAM_PWD_RESET_ENABLED	= "PWD_RESET_ENABLED";
+	public static String	   OUT_PARAM_PWD_RESET_ENABLED = "PWD_RESET_ENABLED";
 	public static String	   OUT_PARAM_USER_LOGIN_ID	   = "USER_LOGIN_ID";
 	public static String	   OUT_PARAM_NAME              = "NAME";
 	public static String	   OUT_PARAM_MOBILE_NUMBER	   = "MOBILE_NUMBER";
@@ -55,30 +55,34 @@ public final class ServerConstant {
 	public static String	   EMAIL_GMAIL_PORT	           = "465";
 	public static String	   EMAIL_ACCT_ID	           = "iskcon.nrjd.noreply@gmail.com";
 	public static String	   DB_DRIVER	               = "jdbc:mysql://localhost:3306/";
-	public static String	   DB_SCHEMA	               = "bv";
 	public static String	   DB_USER_NAME	               = "root";
 	public static String	   DB_PWD	                   = "gurudev";
 	public static String	   EMAIL_ACCT_PWD	           = "jpsgurudev";
 	public static String	   EMAIL_SESSION	           = "mail/Session";
 	public static String	   EMAIL_CONTEXT	           = "java:comp/env";
-	public static String	   SP_PERSIST_USER	           = "{CALL usp_user_register(?,?,?,?,?,?,?,?)}";
-	public static String	   QRY_UPDATE_VERIFY_EMAIL	   = "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
-	public static String	   SP_UPDATE_VERIFY_CODES	   = "{CALL usp_updateVerifCodes(?,?,?)}";
-	public static String	   QRY_RETRIEVE_ACCT_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE EMAIL_ID = ?";
-	public static String	   QRY_UPDATE_VERIFY_MOBILE	   = "UPDATE user_login SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND MOBILE_VERIF_CODE=? AND EMAIL_ID=?";
-	public static String	   QRY_UPDATE_PROFILE	       = "UPDATE user_login SET NAME = ?, MOBILE_NUMBER = ?, LANGUAGE = ?, COUNTRY_CODE = ? WHERE EMAIL_ID = ?";
-	public static String	   QRY_VERIFY_LOGIN	           = "SELECT PASSWORD, ACCT_VERIFIED, PWD_RESET_ENABLED FROM user_login WHERE EMAIL_ID = ?";
-	public static String	   QRY_UPDATE_PWD	           = "UPDATE user_login SET PASSWORD = ?, PWD_RESET_ENABLED = ? WHERE EMAIL_ID = ?";
-	public static String	   QRY_IS_ACCT_EMAIL_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE EMAIL_VERIF_CODE=? AND EMAIL_ID=?";
-	public static String	   QRY_IS_ACCT_MOBILE_VERIFIED	= "SELECT ACCT_VERIFIED FROM user_login WHERE MOBILE_VERIF_CODE=? AND EMAIL_ID=?";
-	public static String	   QRY_GET_USER	               = "SELECT * FROM user_login WHERE EMAIL_ID = ?";
+	// DB schema details
+	public static String	   DB_SCHEMA	               = "BV";
+	// Stored procedure
+	public static String	   SP_PERSIST_USER             = "{CALL USP_USER_REGISTER(?,?,?,?,?,?,?,?)}";
+	public static String	   SP_UPDATE_VERIFY_CODES      = "{CALL USP_UPDATE_VERIF_CODES(?,?,?)}";
+	// Select SQL Queries
+	public static String	   QRY_GET_USER                = "SELECT * FROM USER_LOGIN WHERE EMAIL_ID = ?";
+	public static String	   QRY_VERIFY_LOGIN            = "SELECT PASSWORD, ACCT_VERIFIED, PWD_RESET_ENABLED FROM USER_LOGIN WHERE EMAIL_ID = ?";
+	public static String	   QRY_RETRIEVE_ACCT_VERIFIED  = "SELECT ACCT_VERIFIED FROM USER_LOGIN WHERE EMAIL_ID = ?";
+	public static String	   QRY_IS_ACCT_EMAIL_VERIFIED  = "SELECT ACCT_VERIFIED FROM USER_LOGIN WHERE EMAIL_VERIF_CODE = ? AND EMAIL_ID = ?";
+	public static String	   QRY_IS_ACCT_MOBILE_VERIFIED = "SELECT ACCT_VERIFIED FROM USER_LOGIN WHERE MOBILE_VERIF_CODE = ? AND EMAIL_ID = ?";
+	// Update SQL queries.
+	public static String	   QRY_UPDATE_VERIFY_EMAIL     = "UPDATE USER_LOGIN SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND EMAIL_VERIF_CODE = ? AND EMAIL_ID = ?";
+	public static String	   QRY_UPDATE_VERIFY_MOBILE    = "UPDATE USER_LOGIN SET ACCT_VERIFIED=1 WHERE ACCT_VERIFIED = 0 AND MOBILE_VERIF_CODE = ? AND EMAIL_ID = ?";
+	public static String	   QRY_UPDATE_PWD              = "UPDATE USER_LOGIN SET PASSWORD = ?, PWD_RESET_ENABLED = ? WHERE EMAIL_ID = ?";
+	public static String	   QRY_UPDATE_PROFILE          = "UPDATE USER_LOGIN SET NAME = ?, MOBILE_NUMBER = ?, LANGUAGE = ?, COUNTRY_CODE = ? WHERE EMAIL_ID = ?";
+	// Length validations.
 	public static int	       VAL_EMAIL_LEN	           = 50;
 	public static int	       VAL_NAME_LEN	               = 50;
 	public static int	       VAL_PWD_LEN	               = 15;
-	public static int	       VAL_MOBNUM_LEN	           = 12;
+	public static int	       VAL_MOBNUM_LEN	           = 20;
 
 	private ServerConstant() {
-
 	}
 
 }
